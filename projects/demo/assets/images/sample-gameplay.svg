@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="night" x2="0" y2="1">
+      <stop stop-color="#102432"/>
+      <stop offset=".7" stop-color="#244d4c"/>
+      <stop offset="1" stop-color="#0a1e24"/>
+    </linearGradient>
+    <radialGradient id="portal">
+      <stop stop-color="#e8d483"/>
+      <stop offset=".3" stop-color="#83bfad"/>
+      <stop offset="1" stop-color="#1b4952"/>
+    </radialGradient>
+    <linearGradient id="ground" x2="0" y2="1">
+      <stop stop-color="#24444a"/>
+      <stop offset="1" stop-color="#0d1c24"/>
+    </linearGradient>
+    <filter id="light"><feGaussianBlur stdDeviation="24"/></filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#night)"/>
+  <circle cx="960" cy="492" r="275" fill="#bad891" opacity=".23" filter="url(#light)"/>
+  <path d="M0 660 120 470 220 610 345 410 470 650 590 480 720 690 1920 690V1080H0Z" fill="#143238"/>
+  <path d="M1920 665 1790 440 1660 610 1545 380 1380 650 1250 500 1090 695V1080H1920Z" fill="#153339"/>
+  <path d="M0 930 330 805 680 905 960 740 1250 905 1610 790 1920 935V1080H0Z" fill="url(#ground)"/>
+  <path d="M704 773V410Q704 180 960 180T1216 410V773Z" fill="#11292f" stroke="#bca76b" stroke-width="32"/>
+  <path d="M758 739V415Q758 232 960 232T1162 415V739Z" fill="url(#portal)"/>
+  <path d="M832 736V417Q832 310 960 310T1088 417V736Z" fill="#cee0ac" opacity=".18"/>
+  <path d="M702 782 1218 782 1375 1080H545Z" fill="#344b47" stroke="#9e926e" stroke-width="16"/>
+  <path d="M805 782 780 1080M1105 782 1140 1080M702 900h516" stroke="#758175" stroke-width="9" opacity=".65"/>
+  <path d="M430 1100 520 730 570 730 650 1100ZM1460 1100l70-390h55l105 390Z" fill="#0a2027"/>
+  <circle cx="525" cy="745" r="86" fill="#6da89e" opacity=".25" filter="url(#light)"/>
+  <circle cx="1555" cy="735" r="86" fill="#6da89e" opacity=".25" filter="url(#light)"/>
+  <g fill="#0b1c24">
+    <circle cx="955" cy="757" r="24"/>
+    <path d="M932 780h46l28 135h-97Z"/>
+    <path d="M918 904h28l-14 111h-38ZM970 904h27l31 111h-39Z"/>
+  </g>
+  <rect x="52" y="52" width="452" height="94" rx="14" fill="#07151bbb" stroke="#cbb774" stroke-width="3"/>
+  <text x="86" y="114" fill="#e9e6d8" font-size="42" font-weight="bold" font-family="sans-serif">SAMPLE GAMEPLAY</text>
+  <rect x="1500" y="52" width="366" height="94" rx="14" fill="#07151bbb" stroke="#cbb774" stroke-width="3"/>
+  <text x="1544" y="113" fill="#e9e6d8" font-size="36" font-weight="bold" font-family="sans-serif">ORIGINAL ART</text>
+</svg>

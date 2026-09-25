@@ -1,0 +1,21 @@
+{
+  "name": "narrated-video-kit-remotion",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "project": "node scripts/project.mjs",
+    "studio": "node scripts/project.mjs studio",
+    "render": "node scripts/project.mjs render",
+    "final": "node scripts/project.mjs final",
+    "check": "node scripts/project.mjs check"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.527",
+    "@remotion/media": "4.0.527",
+    "@remotion/media-utils": "4.0.527",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "remotion": "4.0.527"
+  }
+}

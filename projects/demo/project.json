@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "title": "動画制作デモ｜背景・声・画像・章・締め",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "persona": "nosojii",
+  "theme": {"accent": "#f6c84c"},
+  "captions": {"mode": "spoken"},
+  "chapterPlacement": "top-left-fixed",
+  "chapterIntro": {"durationSeconds": 2.8},
+  "soundtrack": {
+    "asset": "sample-music",
+    "volume": 0.1,
+    "loop": true,
+    "fadeInSeconds": 0.8,
+    "fadeOutSeconds": 1.2
+  },
+  "assets": {
+    "background": {
+      "kind": "image",
+      "src": "projects/demo/assets/images/cover.svg",
+      "origin": "generated",
+      "originalName": "cover.svg"
+    },
+    "sample-gameplay": {
+      "kind": "image",
+      "src": "projects/demo/assets/images/sample-gameplay.svg",
+      "origin": "generated",
+      "originalName": "sample-gameplay.svg"
+    },
+    "sample-motion": {
+      "kind": "video",
+      "src": "projects/demo/assets/footage/sample-motion.webm",
+      "origin": "generated",
+      "originalName": "sample-motion.webm",
+      "durationSeconds": 8
+    },
+    "sample-music": {
+      "kind": "audio",
+      "src": "projects/demo/assets/audio/music/sample-ambient.wav",
+      "origin": "generated",
+      "originalName": "sample-ambient.wav",
+      "durationSeconds": 12
+    },
+    "voice-01": {
+      "kind": "audio",
+      "src": "projects/demo/assets/audio/narration/voice-01.wav",
+      "origin": "aivis",
+      "originalName": "voice-01.wav",
+      "durationSeconds": 5.392,
+      "speedScale": 1.15
+    },
+    "voice-02": {
+      "kind": "audio",
+      "src": "projects/demo/assets/audio/narration/voice-02.wav",
+      "origin": "aivis",
+      "originalName": "voice-02.wav",
+      "durationSeconds": 7.148,
+      "speedScale": 1.15
+    },
+    "voice-03": {
+      "kind": "audio",
+      "src": "projects/demo/assets/audio/narration/voice-03.wav",
+      "origin": "aivis",
+      "originalName": "voice-03.wav",
+      "durationSeconds": 7.978,
+      "speedScale": 1.15
+    },
+    "voice-04": {
+      "kind": "audio",
+      "src": "projects/demo/assets/audio/narration/voice-04.wav",
+      "origin": "aivis",
+      "originalName": "voice-04.wav",
+      "durationSeconds": 8.235,
+      "speedScale": 1.15
+    }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "avatar": true,
+      "padAfterSeconds": 0.5,
+      "background": {"asset": "background", "fit": "cover"},
+      "narration": {"asset": "voice-01", "text": "ようこそ。これはゲーム紹介動画を組み立てるための見本じゃ。"},
+      "overlays": [
+        {"type": "title", "eyebrow": "PROJECT DEMO", "text": "動画づくりの見本", "subtitle": "話す・見せる・仕上げる"}
+      ]
+    },
+    {
+      "id": "chapter-assets",
+      "durationSeconds": 2.8,
+      "avatar": true,
+      "chapterStart": true,
+      "chapterLabel": "背景と音声",
+      "background": {"asset": "background", "fit": "cover"},
+      "overlays": []
+    },
+    {
+      "id": "background-and-voice",
+      "avatar": true,
+      "chapterLabel": "背景と音声",
+      "padAfterSeconds": 0.4,
+      "background": {"asset": "sample-motion", "fit": "cover", "volume": 0},
+      "narration": {"asset": "voice-02", "text": "背景には画像も動画も使える。声と字幕を重ねると、紹介の土台ができるぞ。"},
+      "overlays": []
+    },
+    {
+      "id": "image-inset",
+      "avatar": true,
+      "chapterLabel": "背景と音声",
+      "padAfterSeconds": 0.4,
+      "background": {"asset": "background", "fit": "cover"},
+      "inset": {"asset": "sample-gameplay", "layout": "feature", "width": 1320},
+      "narration": {"asset": "voice-03", "text": "見せたい場面では、画像を中央に大きく置く。話している内容が、ぐっと伝わりやすくなるんじゃ。"},
+      "overlays": []
+    },
+    {
+      "id": "chapter-finish",
+      "durationSeconds": 2.8,
+      "avatar": true,
+      "chapterStart": true,
+      "chapterLabel": "仕上げ",
+      "background": {"asset": "background", "fit": "cover"},
+      "overlays": []
+    },
+    {
+      "id": "finish",
+      "avatar": true,
+      "chapterLabel": "仕上げ",
+      "padAfterSeconds": 0.5,
+      "background": {"asset": "background", "fit": "cover"},
+      "narration": {"asset": "voice-04", "text": "章の見出しで話題を区切り、最後に締めの画面を置く。さあ、おぬしの動画も作ってみるのじゃ。"},
+      "overlays": []
+    },
+    {
+      "id": "end-card",
+      "durationSeconds": 5.5,
+      "avatar": true,
+      "background": {"asset": "background", "fit": "cover"},
+      "overlays": [],
+      "endCard": {
+        "eyebrow": "PROJECT DEMO",
+        "headline": "次は、あなたの動画を",
+        "signoff": "素材と台本から始めよう"
+      }
+    }
+  ]
+}
