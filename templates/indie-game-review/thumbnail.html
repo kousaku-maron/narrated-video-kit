@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1280, initial-scale=1">
+  <title>Review thumbnail template</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; }
+    body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; }
+    .canvas { position: relative; width: 1280px; height: 720px; overflow: hidden; background: #14202a; }
+    .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .shade { position: absolute; inset: 0; background: linear-gradient(90deg, #071319ee, #071319bb 34%, #07131955 66%, transparent 90%); }
+    .category { position: absolute; left: 55px; top: 49px; padding: 8px 16px 10px; background: #ffca54; color: #1b1c13; font-size: 28px; font-weight: 900; }
+    .headline { position: absolute; left: 55px; top: 190px; width: 820px; margin: 0; font-weight: 900; line-height: 1.17; }
+    .headline span { display: block; white-space: nowrap; paint-order: stroke fill; text-shadow: 0 7px 0 #111a13, 0 11px 24px #000; }
+    .headline .first { color: #fff; font-size: 81px; -webkit-text-stroke: 2px #111a13; }
+    .headline .second { color: #ffca54; font-size: 105px; -webkit-text-stroke: 4px #251810; margin-top: 16px; }
+    .rule { position: absolute; left: 57px; top: 528px; width: 390px; height: 7px; background: #ffc84c; }
+    .subline { position: absolute; left: 56px; top: 552px; color: #fff5dd; font-size: 31px; font-weight: 900; text-shadow: 0 3px 10px #000; }
+    .logo { position: absolute; right: 30px; top: 30px; width: 405px; height: 94px; object-fit: contain; object-position: right top; filter: drop-shadow(0 4px 7px #000b); }
+    .avatar { position: absolute; right: 27px; bottom: -11px; width: 237px; height: 264px; object-fit: contain; object-position: bottom right; filter: drop-shadow(0 4px 9px #000b); }
+    .frame { position: absolute; inset: 10px; border: 3px solid #ffcd7a8f; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <!-- コピー先の projects/YYYYMMDD-name/assets/images/ に画像を置くか、下のパスを変更する -->
+    <img class="art" src="../assets/images/thumbnail-bg.jpg" alt="">
+    <div class="shade"></div>
+    <div class="category">プレイテストレビュー</div>
+    <h1 class="headline"><span class="first">意外な一面を</span><span class="second">短く伝える!?</span></h1>
+    <div class="rule"></div>
+    <div class="subline">自分の体験を一言で</div>
+    <img class="logo" src="../assets/images/thumbnail-logo.png" alt="">
+    <img class="avatar" src="../assets/images/thumbnail-avatar.png" alt="">
+    <div class="frame"></div>
+  </div>
+</body>
+</html>

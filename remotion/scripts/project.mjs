@@ -20,6 +20,18 @@ const safeSlug = (value) => {
   if (!/^[a-z0-9][a-z0-9-]{0,49}$/.test(value ?? '')) fail('Project name must use lowercase letters, numbers, and hyphens');
   return value;
 };
+const requireDatedProjectName = (slug) => {
+  safeSlug(slug);
+  const match = /^(\d{8})-[a-z0-9][a-z0-9-]*$/.exec(slug);
+  if (!match || match[1] === '00000000') fail('New project name must be YYYYMMDD-name (project start date; 00000000 is reserved for the demo)');
+  const year = Number(match[1].slice(0, 4));
+  const month = Number(match[1].slice(4, 6));
+  const day = Number(match[1].slice(6, 8));
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() + 1 !== month || date.getUTCDate() !== day) {
+    fail('Project name must start with a valid YYYYMMDD date');
+  }
+};
 const manifestPath = (slug) => path.join(projectsDir, safeSlug(slug), 'project.json');
 const projectAssetsDir = (slug) => path.join(projectsDir, safeSlug(slug), 'assets');
 const save = async (filename, value) => {
@@ -107,6 +119,7 @@ async function check(slug) {
 }
 
 async function init(slug) {
+  requireDatedProjectName(slug);
   const filename = manifestPath(slug);
   if (await stat(filename).catch(() => null)) fail(`Project already exists: ${slug}`);
   await mkdir(path.dirname(filename), {recursive: true});

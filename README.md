@@ -5,6 +5,7 @@
 ## フォルダ構成
 
 - `projects/`: 動画ごとの台本・素材・完成版
+- `templates/`: 次の動画に使う企画・台本・画面設計・投稿文のひな形
 - `pelsona/`: 語り手ごとの設定とアバター
 - `assets/`: 複数の動画で再利用する素材の原本
 - `remotion/`: プレビューと動画書き出しの実装
@@ -12,13 +13,13 @@
 
 ## まず完成デモを見る
 
-[動画制作デモ](projects/demo/VIDEO.md) に約42秒の完成MP4、台本、素材、場面設定を同梱しています。MP4はそのまま再生できます。場面を編集してプレビューする場合は Node.js 20 以降を用意し、次を実行します。
+[動画制作デモ](projects/00000000-demo/VIDEO.md) に約42秒の完成MP4、台本、素材、場面設定を同梱しています。MP4はそのまま再生できます。場面を編集してプレビューする場合は Node.js 20 以降を用意し、次を実行します。
 
 ```sh
 cd remotion
 npm install
-npm run check -- demo
-npm run studio -- demo
+npm run check -- 00000000-demo
+npm run studio -- 00000000-demo
 ```
 
 デモの再生・書き出しには音声エンジンは不要です。
@@ -60,7 +61,9 @@ PYTHONPATH=speech/src python3 -m indie_narration --engine aivis synthesize \
 
 ## 動画を作る
 
-映像の準備、素材の追加、プレビュー、MP4 書き出しは [remotion/README.md](remotion/README.md) を参照してください。動画ごとに `VIDEO.md`、`SCRIPT.md`、`project.json`、素材の原本を [projects/](projects/README.md) にまとめます。`demo/` 以外の動画プロジェクトはローカル専用で、Gitには含めません。共通素材の原本は [assets/](assets/README.md) に置きます。場面を追加するたびに途中版を確認できます。手持ちの動画・画像と生成画像を同じように背景素材として使えます。
+映像の準備、素材の追加、プレビュー、MP4 書き出しは [remotion/README.md](remotion/README.md) を参照してください。動画ごとに `VIDEO.md`、`SCRIPT.md`、`project.json`、素材の原本を [projects/](projects/README.md) にまとめます。用途別のひな形は [templates/](templates/README.md) にあります。`00000000-demo/` 以外の動画プロジェクトはローカル専用で、Gitには含めません。共通素材の原本は [assets/](assets/README.md) に置きます。場面を追加するたびに途中版を確認できます。手持ちの動画・画像と生成画像を同じように背景素材として使えます。
+
+制作を支援するエージェントの進め方は [AGENTS.md](AGENTS.md) に記録しています。新規動画では最初にテンプレートを提案し、スクリーンショットは候補画像を見せて表示箇所を確認してから採用します。
 
 語り手の口調・性格・音声とアバター画像は、[pelsona/](pelsona/README.md) にキャラクターごとにまとめます。動画で使う際は、そのキャラクターの `PELSONA.md` を台本の基準にします。
 

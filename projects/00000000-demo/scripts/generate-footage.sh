@@ -3,8 +3,8 @@ set -euo pipefail
 
 # macOS: turn the original SVG into a gently moving, silent WebM sample.
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
-source_svg="$root/projects/demo/assets/images/cover.svg"
-output="$root/projects/demo/assets/footage/sample-motion.webm"
+source_svg="$root/projects/00000000-demo/assets/images/cover.svg"
+output="$root/projects/00000000-demo/assets/footage/sample-motion.webm"
 compositor="$root/remotion/node_modules/@remotion/compositor-darwin-arm64"
 
 if [[ ! -x "$compositor/ffmpeg" ]]; then

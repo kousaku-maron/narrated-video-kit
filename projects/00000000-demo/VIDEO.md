@@ -9,11 +9,11 @@
 ```sh
 cd remotion
 npm install
-npm run check -- demo
-npm run studio -- demo
+npm run check -- 00000000-demo
+npm run studio -- 00000000-demo
 ```
 
-Studio では `IndieVideo` を再生します。自分で試写を書き出す場合は `npm run render -- demo` を実行し、`remotion/out/demo/` のMP4を確認してください。完成版と字幕を再生成する場合は `npm run final -- demo --replace` を使います。
+Studio では `IndieVideo` を再生します。自分で試写を書き出す場合は `npm run render -- 00000000-demo` を実行し、`remotion/out/00000000-demo/` のMP4を確認してください。完成版と字幕を再生成する場合は `npm run final -- 00000000-demo --replace` を使います。
 
 ## ファイルの読み方
 
@@ -26,11 +26,11 @@ Studio では `IndieVideo` を再生します。自分で試写を書き出す�
 
 ## 自分の動画を始める
 
-`remotion/` から `npm run project -- init my-game` を実行すると、ルートの `projects/my-game/` に空の制作フォルダができます。以下の順に埋めてください。
+`remotion/` から `npm run project -- init 20260928-my-game` を実行すると、ルートの `projects/20260928-my-game/` に空の制作フォルダができます。例の日付は制作開始日（日本時間）に置き換えてください。以下の順に埋めてください。
 
 1. `VIDEO.md` に動画の目的と素材、`SCRIPT.md` に実際に読む文を書く。
-2. `npm run project -- add my-game /absolute/path/to/image.png --id image-01` のように素材を登録する。手元の映像、画像、生成画像を同じ方法で追加できます。
+2. `npm run project -- add 20260928-my-game /absolute/path/to/image.png --id image-01` のように素材を登録する。手元の映像、画像、生成画像を同じ方法で追加できます。
 3. 音声を `speech/` のCLIで作って登録し、`project.json` の `scenes` に素材IDと発話文を並べる。このデモの場面設定を必要な部分だけ参考にする。
-4. `npm run check -- my-game`、`npm run studio -- my-game` で確認し、`npm run final -- my-game` で書き出す。
+4. `npm run check -- 20260928-my-game`、`npm run studio -- 20260928-my-game` で確認し、`npm run final -- 20260928-my-game` で書き出す。
 
-詳しいフィールドとコマンドは [Remotionの説明](../../remotion/README.md) を参照してください。`demo/` だけをGitで管理し、新しく作るプロジェクトはローカル専用です。公開する自分の動画には、のそ爺の画像と台詞をそのまま流用せず、自分のキャラクターに差し替えてください。コードと各素材の利用範囲は [ライセンス方針](../../LICENSING.md) を参照してください。
+詳しいフィールドとコマンドは [Remotionの説明](../../remotion/README.md) を参照してください。`00000000-demo/` だけをGitで管理し、新しく作るプロジェクトはローカル専用です。公開する自分の動画には、のそ爺の画像と台詞をそのまま流用せず、自分のキャラクターに差し替えてください。コードと各素材の利用範囲は [ライセンス方針](../../LICENSING.md) を参照してください。

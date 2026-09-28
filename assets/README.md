@@ -2,7 +2,7 @@
 
 このフォルダは、複数の動画で再利用する素材の原本を置く場所です。`music/`、`sfx/`、`backgrounds/`、`branding/` を直接並べます。使う素材は `remotion/` の `npm run project -- add` で `projects/<動画名>/assets/` にコピーしてください。ここに置くだけでは動画に自動挿入されません。
 
-ゲーム固有の画像や録画は、使う動画プロジェクトの `assets/` に保存します。採用前の元ファイルを残す場合は、そのプロジェクトの `assets/originals/` を使います。たとえば Invokyr の元画像は `projects/invokyr-review/assets/originals/images/` にあります。語り手の設定とアバターは `pelsona/` で管理します。
+ゲーム固有の画像や録画は、使う動画プロジェクトの `assets/` に保存します。採用前の元ファイルを残す場合は、そのプロジェクトの `assets/originals/` を使います。たとえば Invokyr の元画像は `projects/20260923-invokyr-review/assets/originals/images/` にあります。語り手の設定とアバターは `pelsona/` で管理します。
 
 ## 置き場
 

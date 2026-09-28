@@ -1,6 +1,6 @@
 import React from 'react';
 import {Composition} from 'remotion';
-import demo from '../../projects/demo/project.json';
+import demo from '../../projects/00000000-demo/project.json';
 import {IndieVideo} from './video.jsx';
 import {totalFrames, validateProject} from './project.js';
 

@@ -4,11 +4,11 @@
 
 | 対象 | 扱い |
 | --- | --- |
-| `speech/`、`remotion/`、`projects/demo/scripts/`、デモの設定と一般向けドキュメント | MIT |
-| `projects/demo/assets/images/*.svg`、`projects/demo/assets/footage/sample-motion.webm`、`projects/demo/assets/audio/music/sample-ambient.wav` | このリポジトリ用に作成したサンプル素材。MIT |
+| `speech/`、`remotion/`、`projects/00000000-demo/scripts/`、デモの設定と一般向けドキュメント | MIT |
+| `projects/00000000-demo/assets/images/*.svg`、`projects/00000000-demo/assets/footage/sample-motion.webm`、`projects/00000000-demo/assets/audio/music/sample-ambient.wav` | このリポジトリ用に作成したサンプル素材。MIT |
 | `pelsona/nosojii/` のキャラクター設定・名称・外見・アバター画像 | MIT対象外。利用条件は [のそ爺の権利表示](pelsona/nosojii/RIGHTS.md) を参照 |
-| `projects/demo/assets/audio/narration/*.wav` | AivisSpeechの「ろてじん（長老ボイス）」で生成した音声。MIT対象外。下記のモデル利用条件を確認 |
-| `projects/demo/publish/final.mp4`、`projects/demo/publish/subtitles.srt`、デモ台本ののそ爺固有の台詞 | キャラクターと合成音声を含む見本。MIT対象外。独立した動画・音声・台詞素材としての再利用は許可していません |
+| `projects/00000000-demo/assets/audio/narration/*.wav` | AivisSpeechの「ろてじん（長老ボイス）」で生成した音声。MIT対象外。下記のモデル利用条件を確認 |
+| `projects/00000000-demo/publish/final.mp4`、`projects/00000000-demo/publish/subtitles.srt`、デモ台本ののそ爺固有の台詞 | キャラクターと合成音声を含む見本。MIT対象外。独立した動画・音声・台詞素材としての再利用は許可していません |
 | `assets/` に記録した外部配布素材、各ゲームの画像・映像 | このリポジトリのMITでは許諾しません。各配布元の条件に従ってください。通常、素材の実ファイルはGitに含めません |
 
 ## 合成音声

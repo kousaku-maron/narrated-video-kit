@@ -57,6 +57,9 @@ export function validateProject(project) {
         throw new Error(`soundtrack.${key} must be nonnegative`);
       }
     }
+    if (soundtrack.endAtSeconds !== undefined && (!Number.isFinite(soundtrack.endAtSeconds) || soundtrack.endAtSeconds <= 0)) {
+      throw new Error('soundtrack.endAtSeconds must be positive');
+    }
   }
 
   if (project.backgroundPlaylist !== undefined) {
@@ -66,6 +69,9 @@ export function validateProject(project) {
     for (const clip of project.backgroundPlaylist) {
       if (!isObject(clip) || project.assets[clip.asset]?.kind !== 'video' || !Number.isFinite(clip.durationSeconds) || clip.durationSeconds <= 0) {
         throw new Error('Each backgroundPlaylist clip needs a video asset and positive durationSeconds');
+      }
+      if (clip.trimStartSeconds !== undefined && (!Number.isFinite(clip.trimStartSeconds) || clip.trimStartSeconds < 0)) {
+        throw new Error('backgroundPlaylist trimStartSeconds must be nonnegative');
       }
     }
   }
@@ -101,6 +107,19 @@ export function validateProject(project) {
     if (scene.endCard?.trimStartSeconds !== undefined && (!Number.isFinite(scene.endCard.trimStartSeconds) || scene.endCard.trimStartSeconds < 0)) {
       throw new Error(`Scene ${scene.id}: endCard.trimStartSeconds must be nonnegative`);
     }
+    if (scene.endRoll !== undefined) {
+      const ending = scene.endRoll;
+      if (!isObject(ending) || typeof ending.headline !== 'string' || !ending.headline.trim() ||
+          !Number.isFinite(ending.finalSeconds) || ending.finalSeconds <= 0 || ending.finalSeconds >= sceneSeconds(scene, project)) {
+        throw new Error(`Scene ${scene.id}: endRoll needs a headline and finalSeconds within the scene`);
+      }
+      if (project.assets[ending.musicAsset]?.kind !== 'audio') {
+        throw new Error(`Scene ${scene.id}: endRoll.musicAsset must reference audio`);
+      }
+      if (ending.musicVolume !== undefined && (!Number.isFinite(ending.musicVolume) || ending.musicVolume < 0 || ending.musicVolume > 1)) {
+        throw new Error(`Scene ${scene.id}: endRoll.musicVolume must be 0–1`);
+      }
+    }
     sceneSeconds(scene, project);
     if (scene.background?.asset) {
       const kind = project.assets[scene.background.asset]?.kind;
@@ -114,6 +133,24 @@ export function validateProject(project) {
     } else if (scene.background && typeof scene.background.color !== 'string') {
       throw new Error(`Scene ${scene.id}: background needs an asset or color`);
     }
+    if (scene.backgroundCuts !== undefined) {
+      if (!Array.isArray(scene.backgroundCuts) || scene.backgroundCuts.length === 0 || scene.backgroundCuts[0]?.atSeconds !== 0) {
+        throw new Error(`Scene ${scene.id}: backgroundCuts must start at 0`);
+      }
+      let previous = -1;
+      for (const cut of scene.backgroundCuts) {
+        if (!isObject(cut) || !Number.isFinite(cut.atSeconds) || cut.atSeconds <= previous || cut.atSeconds >= sceneSeconds(scene, project)) {
+          throw new Error(`Scene ${scene.id}: backgroundCuts must have increasing times within the scene`);
+        }
+        if (!['image', 'video'].includes(project.assets[cut.asset]?.kind)) {
+          throw new Error(`Scene ${scene.id}: background cut must reference image or video`);
+        }
+        if (cut.trimStartSeconds !== undefined && (!Number.isFinite(cut.trimStartSeconds) || cut.trimStartSeconds < 0)) {
+          throw new Error(`Scene ${scene.id}: background cut trimStartSeconds must be nonnegative`);
+        }
+        previous = cut.atSeconds;
+      }
+    }
     if (scene.inset !== undefined) {
       if (!isObject(scene.inset) || project.assets[scene.inset.asset]?.kind !== 'image') {
         throw new Error(`Scene ${scene.id}: inset.asset must reference an image`);
@@ -126,6 +163,26 @@ export function validateProject(project) {
       }
       if (scene.inset.width !== undefined && (!Number.isFinite(scene.inset.width) || scene.inset.width < 100 || scene.inset.width > project.width)) {
         throw new Error(`Scene ${scene.id}: inset.width must fit within the frame`);
+      }
+    }
+    if (scene.insetSegments !== undefined) {
+      if (!Array.isArray(scene.insetSegments)) throw new Error(`Scene ${scene.id}: insetSegments must be an array`);
+      for (const inset of scene.insetSegments) {
+        if (!isObject(inset) || project.assets[inset.asset]?.kind !== 'image') {
+          throw new Error(`Scene ${scene.id}: inset segment must reference an image`);
+        }
+        if (!Number.isFinite(inset.atSeconds) || inset.atSeconds < 0 || !Number.isFinite(inset.durationSeconds) || inset.durationSeconds <= 0 || inset.atSeconds + inset.durationSeconds > sceneSeconds(scene, project) + 0.01) {
+          throw new Error(`Scene ${scene.id}: inset segment timing must fit within the scene`);
+        }
+        if (inset.position !== undefined && !['left', 'right'].includes(inset.position)) {
+          throw new Error(`Scene ${scene.id}: inset segment position must be left or right`);
+        }
+        if (inset.layout !== undefined && !['standard', 'feature'].includes(inset.layout)) {
+          throw new Error(`Scene ${scene.id}: inset segment layout must be standard or feature`);
+        }
+        if (inset.width !== undefined && (!Number.isFinite(inset.width) || inset.width < 100 || inset.width > project.width)) {
+          throw new Error(`Scene ${scene.id}: inset segment width must fit within the frame`);
+        }
       }
     }
     if (scene.narration !== undefined && !isObject(scene.narration)) throw new Error(`Scene ${scene.id}: narration must be an object`);

@@ -36,6 +36,20 @@ function Background({scene, assets, fps, frame, duration}) {
   return <AbsoluteFill style={{background: background.color ?? '#101820'}} />;
 }
 
+function BackgroundCuts({scene, project, frame, duration}) {
+  return scene.backgroundCuts.map((cut, index) => {
+    const from = Math.round(cut.atSeconds * project.fps);
+    const until = index + 1 < scene.backgroundCuts.length
+      ? Math.round(scene.backgroundCuts[index + 1].atSeconds * project.fps)
+      : duration;
+    return <Sequence key={`${cut.asset}-${index}`} from={from} durationInFrames={until - from}>
+      <AbsoluteFill>
+        <Background scene={{...scene, background: cut}} assets={project.assets} fps={project.fps} frame={frame - from} duration={until - from} />
+      </AbsoluteFill>
+    </Sequence>;
+  });
+}
+
 function ImageInset({inset, assets, frame, project}) {
   const reveal = easeOut(between(frame, 2, 16));
   const feature = inset.layout === 'feature';
@@ -263,6 +277,25 @@ function EndCard({scene, frame, project, accent}) {
   </AbsoluteFill>;
 }
 
+function EndRoll({scene, frame, duration, project}) {
+  if (!scene.endRoll) return null;
+  const {headline, finalSeconds, musicAsset, musicVolume = 0.075} = scene.endRoll;
+  const finalFrames = framesFor(finalSeconds, project.fps);
+  const finalStart = duration - finalFrames;
+  const reveal = easeOut(between(frame, finalStart, finalStart + Math.round(0.6 * project.fps)));
+  return <>
+    <Audio
+      src={staticFile(project.assets[musicAsset].src)}
+      loop
+      volume={(audioFrame) => musicVolume * Math.min(1, audioFrame / project.fps) * Math.max(0, Math.min(1, (duration - audioFrame) / (2 * project.fps)))}
+    />
+    {frame >= finalStart && <AbsoluteFill style={{pointerEvents: 'none'}}>
+      <AbsoluteFill style={{background: 'rgba(4,8,12,.38)', opacity: reveal}} />
+      <div style={{position: 'absolute', left: 78, right: 430, bottom: 82, color: '#fff', fontSize: 58, lineHeight: 1.25, fontWeight: 900, WebkitTextStroke: '4px #101820', paintOrder: 'stroke fill', textShadow: '0 6px 20px #000e', opacity: reveal, transform: `translateY(${Math.round((1 - reveal) * 18)}px)`}}>{headline}</div>
+    </AbsoluteFill>}
+  </>;
+}
+
 function ContinuousBackground({project, length}) {
   const playlist = project.backgroundPlaylist;
   if (!playlist) return null;
@@ -272,7 +305,7 @@ function ContinuousBackground({project, length}) {
     const clip = playlist[index % playlist.length];
     const duration = Math.min(length - start, Math.max(1, Math.floor(clip.durationSeconds * project.fps)));
     segments.push(<Sequence key={`${clip.asset}-${index}`} from={start} durationInFrames={duration}>
-      <Video src={staticFile(project.assets[clip.asset].src)} muted volume={0} objectFit="cover" style={{width: '100%', height: '100%', filter: 'brightness(1.08) contrast(1.03)'}} />
+      <Video src={staticFile(project.assets[clip.asset].src)} trimBefore={Math.round((clip.trimStartSeconds ?? 0) * project.fps)} muted volume={0} objectFit="cover" style={{width: '100%', height: '100%', filter: 'brightness(1.08) contrast(1.03)'}} />
     </Sequence>);
     start += duration;
   }
@@ -288,12 +321,23 @@ function Scene({scene, project}) {
   const accent = project.theme?.accent ?? '#f6c84c';
   const narration = scene.narration?.asset ? project.assets[scene.narration.asset] : null;
   const edgeFade = scene.motion?.fadeEdges ? Math.max(1 - between(frame, 0, 8), between(frame, duration - 9, duration - 1)) : 0;
+  const sceneBackground = !project.backgroundPlaylist || Boolean(scene.background || scene.backgroundCuts);
   return (
-    <AbsoluteFill style={{fontFamily: font, overflow: 'hidden', background: project.backgroundPlaylist ? 'transparent' : '#101820'}}>
-      {!project.backgroundPlaylist && <Background scene={scene} assets={project.assets} fps={project.fps} frame={frame} duration={duration} />}
+    <AbsoluteFill style={{fontFamily: font, overflow: 'hidden', background: sceneBackground ? '#101820' : 'transparent'}}>
+      {sceneBackground && (scene.backgroundCuts
+        ? <BackgroundCuts scene={scene} project={project} frame={frame} duration={duration} />
+        : <Background scene={scene} assets={project.assets} fps={project.fps} frame={frame} duration={duration} />)}
       {scene.chapterLabel && project.chapterPlacement !== 'top-left-fixed' && <div style={{position: 'absolute', top: 54, left: 66, padding: '11px 18px', background: 'rgba(8,16,24,.83)', borderLeft: `6px solid ${accent}`, color: '#fff', fontSize: 27, fontWeight: 900, boxShadow: '0 5px 16px #0007'}}>{scene.chapterLabel}</div>}
       {scene.inset && (!scene.chapterStart || frame >= framesFor(project.chapterIntro?.durationSeconds ?? 0, project.fps)) && <ImageInset inset={scene.inset} assets={project.assets} frame={frame - (scene.chapterStart ? framesFor(project.chapterIntro?.durationSeconds ?? 0, project.fps) : 0)} project={project} />}
-      {scene.overlays.map((item, index) => <Overlay key={`${item.type}-${index}`} item={item} accent={accent} frame={frame} animated={scene.motion?.textEntrance} index={index} avatar={scene.avatar} hasInset={Boolean(scene.inset)} opening={scene.id === 'opening-01'} />)}
+      {(scene.insetSegments ?? []).map((inset, index) => {
+        const from = Math.round(inset.atSeconds * project.fps);
+        const length = Math.min(duration - from, Math.round(inset.durationSeconds * project.fps));
+        return <Sequence key={`${inset.asset}-${index}`} from={from} durationInFrames={length}>
+          <ImageInset inset={inset} assets={project.assets} frame={frame - from} project={project} />
+        </Sequence>;
+      })}
+      {scene.overlays.map((item, index) => <Overlay key={`${item.type}-${index}`} item={item} accent={accent} frame={frame} animated={scene.motion?.textEntrance} index={index} avatar={scene.avatar} hasInset={Boolean(scene.inset || scene.insetSegments?.length)} opening={scene.id === 'opening-01'} />)}
+      <EndRoll scene={scene} frame={frame} duration={duration} project={project} />
       {project.captions?.mode === 'spoken' && narration && scene.narration.text && <NarrationCaption text={scene.narration.text} durationSeconds={narration.durationSeconds} fps={project.fps} sceneFrames={duration} frame={frame} avatar={scene.avatar} />}
       {narration && <Audio src={staticFile(narration.src)} volume={scene.narration.volume ?? 1} />}
       {(scene.sfx ?? []).map((effect, index) => (
@@ -314,8 +358,11 @@ export function IndieVideo(project) {
   const musicVolume = soundtrack && ((frame) => {
     const fadeIn = (soundtrack.fadeInSeconds ?? 0) * project.fps;
     const fadeOut = (soundtrack.fadeOutSeconds ?? 0) * project.fps;
+    const musicEnd = soundtrack.endAtSeconds === undefined
+      ? length
+      : Math.min(length, Math.round(soundtrack.endAtSeconds * project.fps));
     const start = fadeIn > 0 ? Math.min(1, frame / fadeIn) : 1;
-    const end = fadeOut > 0 ? Math.min(1, (length - 1 - frame) / fadeOut) : 1;
+    const end = fadeOut > 0 ? Math.min(1, (musicEnd - 1 - frame) / fadeOut) : frame < musicEnd ? 1 : 0;
     return (soundtrack.volume ?? 0.12) * Math.max(0, Math.min(start, end));
   });
   return (
