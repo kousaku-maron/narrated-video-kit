@@ -66,6 +66,8 @@ npm run final -- 20260928-my-game
 
 `narration.text` は原稿の記録用です。画面に表示する文字は `overlays` に別に書くので、表示名「Invokyr」と読み「インボキア」を使い分けられます。`durationSeconds` を指定すると場面の長さを固定できます。省略した場合は登録した WAV の長さに `padAfterSeconds`（既定 0.4 秒）を足します。
 
+セール紹介などで `intro-title` を使う場合、`text` に加えて `badge`、`eyebrow`、`line1`、`line2`、`count`、`periodLabel`、`periodText` を指定します。`accentColor` は任意の6桁HEX色です。これらの文言は `project.json` から差し替えられます。配置と使用例は [セール紹介テンプレート](../templates/steam-sale-picks/VISUALS.md) を参照してください。
+
 背景は `{"asset":"登録したID"}` か `{"color":"#172b3d"}`。文字部品は `title`、`label`、`headline`、`caption` に加え、短い主張の `statement`、問いの `question`、大きな数字の `stat`、順序を示す `steps`、2項目の対比を示す `pair` を使えます。`steps` は `items` に2〜4個、`pair` は2個の文字列を指定します。`overlays: []` なら素材を全面に見せられます。素材や場面を追加したら `npm run check -- 20260928-my-game` で参照切れを確認してください。Studio は `project.json` の変更を読み直します。
 
 一つのナレーション場面で背景を切り替える場合は、`backgroundCuts` に場面開始からの秒数と素材IDを並べます。最初は `atSeconds: 0` にし、動画素材の途中から使うときは `trimStartSeconds` を指定します。
@@ -77,9 +79,11 @@ npm run final -- 20260928-my-game
 ]
 ```
 
-動画を背景に流しながら画像を重ねる場合は、場面に `"inset": {"asset": "登録した画像ID", "position": "right", "width": 950}` を追加します。`position` は `left` も選べます。資料を大きく見せる場面は `"layout": "feature", "width": 1220` を指定します。
+動画を背景に流しながら画像を重ねる場合は、場面に `"inset": {"asset": "登録した画像ID", "position": "right", "width": 950}` を追加します。`position` は `left` も選べます。資料を大きく見せる場面は `"layout": "feature", "width": 1220` を指定します。横長画像には数値の `aspectRatio` を指定できます。同じ画像を連続する場面で保持する場合、二つ目以降の `inset` / `insetSegments` に `"reveal": false` を付けると表示アニメーションが繰り返されません。
 
 動画を場面をまたいで流し続けるには、プロジェクトに `backgroundPlaylist` を設定します。各動画に `durationSeconds` を指定し、必要な区間だけを使う場合は `trimStartSeconds` も指定します。場面に `background` を指定した場合、その場面だけ背景を上書きできます。画像を場面内の一部の時間だけ表示するには `insetSegments` を使います。
+
+長い本人録画へ切り替える構成では `backgroundPlaylistEndAtSeconds` にトレーラー背景を止める時刻を指定します。本人録画の場面には `background` と `rawBackground: true` を指定すると、録画の明るさを変えずに表示できます。録画音声は `background.volume` で再生します。
 
 ```json
 "backgroundPlaylist": [{"asset": "trailer", "trimStartSeconds": 0, "durationSeconds": 18}],
@@ -104,6 +108,12 @@ node scripts/export-subtitles.mjs 20260928-my-game out/20260928-my-game/subtitle
 
 動画の後半で別の収録音声に切り替える場合は、`soundtrack.endAtSeconds` にBGMを止める動画全体の秒数を指定できます。`fadeOutSeconds` はその時刻より前に適用されます。
 
+長い実プレイ映像の後でBGMを再開する場合は、再開する無声タイトル場面を `endingSoundtrack.startSceneId` に指定します。指定した場面から動画の最後まで同じ曲を連続再生し、最初と最後にフェードを付けられます。
+
+```json
+"endingSoundtrack": {"asset": "music-01", "startSceneId": "transition-ending", "volume": 0.12, "loop": true, "fadeInSeconds": 1, "fadeOutSeconds": 2}
+```
+
 場面には次の項目を追加できます。
 
 ```json
@@ -112,6 +122,22 @@ node scripts/export-subtitles.mjs 20260928-my-game out/20260928-my-game/subtitle
 ```
 
 `backgroundZoom` は静止画をゆっくり拡大、`textEntrance` は文字を順に出現、`fadeEdges` は場面の前後を短く暗転させます。すべて省略可能です。音量は 0〜1 で、ナレーションを聞き取りやすいよう BGM と効果音は小さめから調整してください。
+
+章見出しを左上に固定する動画では、次の設定で共通の章トランジションを使えます。各場面の `chapterLabel` が変わる時、通常は左上の小見出しだけを短く切り替えます。大きな転換点では、前のナレーション場面の後に、ナレーションのない専用場面を約2.2秒置きます。その場面に次の章の `chapterLabel` と `"chapterStart": true` を設定し、画面中央に白い枠・番号・章名を表示します。次のナレーションは専用場面の終了後に始めます。背景映像とBGMは続きます。`chapterIntro` も設定されている場合は、このトランジションを優先します。
+
+```json
+"chapterPlacement": "top-left-fixed",
+"chapterTransition": {"durationSeconds": 2.2, "minorDurationSeconds": 0.24}
+```
+
+雪景色など明るい背景で中央の白枠が読みにくい場合は、`chapterTransition.cardOpacity` を 0〜1 で追加して枠内の暗さを調整できます。省略時は従来の 0.29 です。
+
+```json
+{"id":"transition-next","durationSeconds":2.2,"chapterLabel":"次の章","chapterStart":true,"overlays":[]}
+```
+
+この専用場面を次のナレーション場面の直前に置き、次の場面にも同じ `chapterLabel` を付けます。専用場面には `narration` を設定しません。
+章名のない実プレイ映像を挟む場合も、映像の前後にこの専用場面を置けます。実プレイ映像には章見出しを重ねず、後続のタイトルは最後に表示した章名から切り替わります。
 
 ## 語り手のアバター
 

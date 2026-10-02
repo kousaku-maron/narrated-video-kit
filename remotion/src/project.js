@@ -37,11 +37,17 @@ export function validateProject(project) {
   if (project.persona !== undefined && !/^[a-z0-9][a-z0-9-]{0,49}$/.test(project.persona)) {
     throw new Error('persona must be a pelsona/ folder name');
   }
+  if (project.previewStaticAvatar !== undefined && typeof project.previewStaticAvatar !== 'boolean') {
+    throw new Error('previewStaticAvatar must be a boolean');
+  }
 
   for (const [id, asset] of Object.entries(project.assets)) {
     if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) throw new Error(`Invalid asset ID: ${id}`);
     if (!isObject(asset) || !['image', 'video', 'audio'].includes(asset.kind)) throw new Error(`Asset ${id}: invalid kind`);
     if (!validAssetPath(asset.src)) throw new Error(`Asset ${id}: src must be a relative path under public/`);
+    if (asset.mouthFrames !== undefined && (asset.kind !== 'audio' || typeof asset.mouthFrames !== 'string' || !/^[cho]+$/.test(asset.mouthFrames) || !Number.isFinite(asset.mouthFps) || asset.mouthFps <= 0)) {
+      throw new Error(`Asset ${id}: mouthFrames require audio and a positive mouthFps`);
+    }
   }
 
   if (project.soundtrack !== undefined) {
@@ -52,6 +58,9 @@ export function validateProject(project) {
     if (soundtrack.volume !== undefined && (!Number.isFinite(soundtrack.volume) || soundtrack.volume < 0 || soundtrack.volume > 1)) {
       throw new Error('soundtrack.volume must be 0–1');
     }
+    if (soundtrack.muteDuringTransitions !== undefined && typeof soundtrack.muteDuringTransitions !== 'boolean') {
+      throw new Error('soundtrack.muteDuringTransitions must be boolean');
+    }
     for (const key of ['fadeInSeconds', 'fadeOutSeconds']) {
       if (soundtrack[key] !== undefined && (!Number.isFinite(soundtrack[key]) || soundtrack[key] < 0)) {
         throw new Error(`soundtrack.${key} must be nonnegative`);
@@ -59,6 +68,23 @@ export function validateProject(project) {
     }
     if (soundtrack.endAtSeconds !== undefined && (!Number.isFinite(soundtrack.endAtSeconds) || soundtrack.endAtSeconds <= 0)) {
       throw new Error('soundtrack.endAtSeconds must be positive');
+    }
+  }
+  if (project.endingSoundtrack !== undefined) {
+    const ending = project.endingSoundtrack;
+    if (!isObject(ending) || project.assets[ending.asset]?.kind !== 'audio') {
+      throw new Error('endingSoundtrack.asset must reference audio');
+    }
+    if (typeof ending.startSceneId !== 'string' || !project.scenes.some((scene) => scene.id === ending.startSceneId)) {
+      throw new Error('endingSoundtrack.startSceneId must reference a scene');
+    }
+    if (ending.volume !== undefined && (!Number.isFinite(ending.volume) || ending.volume < 0 || ending.volume > 1)) {
+      throw new Error('endingSoundtrack.volume must be 0–1');
+    }
+    for (const key of ['fadeInSeconds', 'fadeOutSeconds']) {
+      if (ending[key] !== undefined && (!Number.isFinite(ending[key]) || ending[key] < 0)) {
+        throw new Error(`endingSoundtrack.${key} must be nonnegative`);
+      }
     }
   }
 
@@ -75,6 +101,10 @@ export function validateProject(project) {
       }
     }
   }
+  if (project.backgroundPlaylistEndAtSeconds !== undefined &&
+      (!Number.isFinite(project.backgroundPlaylistEndAtSeconds) || project.backgroundPlaylistEndAtSeconds <= 0)) {
+    throw new Error('backgroundPlaylistEndAtSeconds must be positive');
+  }
 
   if (project.chapterIntro !== undefined && (
     !isObject(project.chapterIntro) ||
@@ -83,6 +113,29 @@ export function validateProject(project) {
   )) {
     throw new Error('chapterIntro.durationSeconds must be positive');
   }
+  if (project.chapterTransition !== undefined) {
+    if (!isObject(project.chapterTransition) ||
+        !Number.isFinite(project.chapterTransition.durationSeconds) ||
+        project.chapterTransition.durationSeconds <= 0 ||
+        project.chapterTransition.durationSeconds > 4) {
+      throw new Error('chapterTransition.durationSeconds must be greater than 0 and at most 4');
+    }
+    if (project.chapterTransition.minorDurationSeconds !== undefined && (
+        !Number.isFinite(project.chapterTransition.minorDurationSeconds) ||
+        project.chapterTransition.minorDurationSeconds <= 0 ||
+        project.chapterTransition.minorDurationSeconds > 1)) {
+      throw new Error('chapterTransition.minorDurationSeconds must be greater than 0 and at most 1');
+    }
+    if (project.chapterTransition.cardOpacity !== undefined && (
+        !Number.isFinite(project.chapterTransition.cardOpacity) ||
+        project.chapterTransition.cardOpacity < 0 ||
+        project.chapterTransition.cardOpacity > 1)) {
+      throw new Error('chapterTransition.cardOpacity must be between 0 and 1');
+    }
+    if (project.chapterPlacement !== 'top-left-fixed') {
+      throw new Error('chapterTransition requires top-left-fixed placement');
+    }
+  }
 
   const ids = new Set();
   for (const scene of project.scenes) {
@@ -90,9 +143,21 @@ export function validateProject(project) {
     if (ids.has(scene.id)) throw new Error(`Duplicate scene ID: ${scene.id}`);
     ids.add(scene.id);
     if (scene.avatar !== undefined && typeof scene.avatar !== 'boolean') throw new Error(`Scene ${scene.id}: avatar must be a boolean`);
+    if (scene.rawBackground !== undefined && typeof scene.rawBackground !== 'boolean') throw new Error(`Scene ${scene.id}: rawBackground must be a boolean`);
     if (scene.avatar && !project.persona) throw new Error(`Scene ${scene.id}: avatar requires project.persona`);
     if (scene.chapterLabel !== undefined && (typeof scene.chapterLabel !== 'string' || !scene.chapterLabel.trim())) {
       throw new Error(`Scene ${scene.id}: chapterLabel must be nonempty text`);
+    }
+    if (scene.chapterStart !== undefined && typeof scene.chapterStart !== 'boolean') {
+      throw new Error(`Scene ${scene.id}: chapterStart must be a boolean`);
+    }
+    if (project.chapterTransition && scene.chapterStart) {
+      if (scene.narration?.asset) {
+        throw new Error(`Scene ${scene.id}: chapter transition scene must not contain narration`);
+      }
+      if (framesFor(sceneSeconds(scene, project), project.fps) < framesFor(project.chapterTransition.durationSeconds, project.fps)) {
+        throw new Error(`Scene ${scene.id}: chapter transition scene is shorter than chapterTransition.durationSeconds`);
+      }
     }
     if (scene.endCard !== undefined && (
       !isObject(scene.endCard) ||
@@ -164,6 +229,12 @@ export function validateProject(project) {
       if (scene.inset.width !== undefined && (!Number.isFinite(scene.inset.width) || scene.inset.width < 100 || scene.inset.width > project.width)) {
         throw new Error(`Scene ${scene.id}: inset.width must fit within the frame`);
       }
+      if (scene.inset.aspectRatio !== undefined && (!Number.isFinite(scene.inset.aspectRatio) || scene.inset.aspectRatio <= 0)) {
+        throw new Error(`Scene ${scene.id}: inset.aspectRatio must be positive`);
+      }
+      if (scene.inset.reveal !== undefined && typeof scene.inset.reveal !== 'boolean') {
+        throw new Error(`Scene ${scene.id}: inset.reveal must be a boolean`);
+      }
     }
     if (scene.insetSegments !== undefined) {
       if (!Array.isArray(scene.insetSegments)) throw new Error(`Scene ${scene.id}: insetSegments must be an array`);
@@ -182,6 +253,12 @@ export function validateProject(project) {
         }
         if (inset.width !== undefined && (!Number.isFinite(inset.width) || inset.width < 100 || inset.width > project.width)) {
           throw new Error(`Scene ${scene.id}: inset segment width must fit within the frame`);
+        }
+        if (inset.aspectRatio !== undefined && (!Number.isFinite(inset.aspectRatio) || inset.aspectRatio <= 0)) {
+          throw new Error(`Scene ${scene.id}: inset segment aspectRatio must be positive`);
+        }
+        if (inset.reveal !== undefined && typeof inset.reveal !== 'boolean') {
+          throw new Error(`Scene ${scene.id}: inset segment reveal must be a boolean`);
         }
       }
     }
@@ -207,11 +284,21 @@ export function validateProject(project) {
     }
     if (!Array.isArray(scene.overlays)) throw new Error(`Scene ${scene.id}: overlays must be an array`);
     for (const overlay of scene.overlays) {
-      if (!isObject(overlay) || !['title', 'label', 'headline', 'caption', 'statement', 'question', 'stat', 'steps', 'pair'].includes(overlay.type)) {
+      if (!isObject(overlay) || !['title', 'intro-title', 'label', 'headline', 'caption', 'statement', 'question', 'stat', 'steps', 'pair', 'transition'].includes(overlay.type)) {
         throw new Error(`Scene ${scene.id}: invalid overlay type`);
       }
       if (typeof overlay.text !== 'string' || !overlay.text.trim()) {
         throw new Error(`Scene ${scene.id}: overlay text is required`);
+      }
+      if (overlay.type === 'intro-title') {
+        for (const key of ['badge', 'eyebrow', 'line1', 'line2', 'count', 'periodLabel', 'periodText']) {
+          if (typeof overlay[key] !== 'string' || !overlay[key].trim()) {
+            throw new Error(`Scene ${scene.id}: intro-title.${key} is required`);
+          }
+        }
+        if (overlay.accentColor !== undefined && !/^#[0-9a-fA-F]{6}$/.test(overlay.accentColor)) {
+          throw new Error(`Scene ${scene.id}: intro-title.accentColor must be a six-digit hex color`);
+        }
       }
       if (overlay.type === 'steps' && (!Array.isArray(overlay.items) || overlay.items.length < 2 || overlay.items.length > 4 || overlay.items.some((item) => typeof item !== 'string' || !item.trim()))) {
         throw new Error(`Scene ${scene.id}: steps needs two to four nonempty items`);

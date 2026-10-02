@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1280, initial-scale=1">
+  <title>セール紹介サムネイル</title>
+  <style>
+    :root { --accent: #f05a2a; }
+    * { box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; }
+    body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; }
+    .canvas { position: relative; width: 1280px; height: 720px; overflow: hidden; background: #10121a; isolation: isolate; }
+    .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.1) contrast(1.04); }
+    .shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,6,8,.08) 0%, rgba(5,6,8,.18) 35%, rgba(5,6,8,.50) 55%, rgba(5,6,8,.66) 100%); }
+    .bottom-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(5,6,8,.45), transparent 30%); }
+    .chip { position: absolute; left: 54px; top: 46px; padding: 14px 20px 15px; border-radius: 9px; background: var(--accent); box-shadow: 0 7px 22px #0009; color: #fff; font-size: 25px; line-height: 1.1; font-weight: 900; white-space: nowrap; }
+    .accent { position: absolute; right: 54px; top: 142px; width: 13px; height: 315px; background: var(--accent); }
+    .title { position: absolute; right: 100px; top: 146px; width: 625px; color: #f8f8f6; text-align: right; font-weight: 900; text-shadow: 0 4px 16px #000b; }
+    .eyebrow { color: var(--accent); font-family: "DIN Condensed", "Arial Narrow", sans-serif; font-size: 24px; font-weight: 700; letter-spacing: .13em; line-height: 1.2; margin-bottom: 29px; }
+    .line1 { font-size: 49px; letter-spacing: -.075em; line-height: 1.25; white-space: nowrap; }
+    .line2 { font-size: 69px; letter-spacing: -.075em; line-height: 1.26; white-space: nowrap; }
+    .line3 { font-size: 116px; letter-spacing: -.05em; line-height: 1.07; white-space: nowrap; }
+    .date { position: absolute; right: 100px; bottom: 94px; width: 545px; text-align: right; color: #c8c9cc; font-size: 23px; line-height: 1.45; font-weight: 700; text-shadow: 0 2px 9px #000; }
+    .date::before { content: ""; display: block; width: 130px; height: 2px; margin: 0 0 11px auto; background: #858a90; }
+    .date-label { color: var(--accent); font-size: 21px; font-weight: 900; }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="art" src="../assets/images/thumbnail-bg.png" alt="">
+    <div class="shade"></div>
+    <div class="bottom-shade"></div>
+    <div class="chip">{{セール名}} / {{ジャンル}}{{作品数}}選</div>
+    <div class="accent"></div>
+    <div class="title">
+      <div class="eyebrow">{{英語のセール名と年}}</div>
+      <div class="line1">{{視聴者の目的}}</div>
+      <div class="line2">{{ジャンル}}ゲーム</div>
+      <div class="line3">{{作品数}}選</div>
+    </div>
+    <div class="date">
+      <div class="date-label">{{セール名}}開催期間</div>
+      <div>{{開始 M/D H:MM}} ― {{終了 M/D H:MM}}（日本時間）</div>
+    </div>
+  </div>
+</body>
+</html>

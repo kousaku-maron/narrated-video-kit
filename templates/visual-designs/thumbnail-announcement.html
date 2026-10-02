@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1280, initial-scale=1">
+  <title>告知・期間｜サムネイル原稿</title>
+  <style>
+    :root {
+      --background: #081821;
+      --accent: #ffde49;
+      --kicker-color: #dcf5f5;
+      --avatar-glow: #1bb6b877;
+      --hero-position: center;
+      --headline-size: 104px;
+      --kicker-size: 35px;
+      --sub-size: 43px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; }
+    body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; }
+    .canvas { position: relative; width: 1280px; height: 720px; background: var(--background); overflow: hidden; isolation: isolate; }
+    .hero { position: absolute; left: 0; top: 0; width: 1280px; height: 415px; object-fit: cover; object-position: var(--hero-position); }
+    .fade { position: absolute; inset: 250px 0 0; background: linear-gradient(0deg, var(--background) 4%, var(--background) 39%, transparent 100%); }
+    .accent { position: absolute; left: 48px; top: 416px; width: 112px; height: 8px; border-radius: 5px; background: var(--accent); }
+    .kicker { position: absolute; left: 49px; right: 305px; top: 441px; color: var(--kicker-color); font-size: var(--kicker-size); line-height: 1.1; font-weight: 900; letter-spacing: .02em; text-shadow: 0 3px 8px #000c; white-space: nowrap; }
+    .headline { position: absolute; left: 39px; right: 305px; top: 493px; margin: 0; color: var(--accent); font-size: var(--headline-size); line-height: 1.1; font-weight: 900; letter-spacing: -.045em; white-space: nowrap; -webkit-text-stroke: 3px var(--background); paint-order: stroke fill; text-shadow: 0 8px 16px #000b; }
+    .sub { position: absolute; left: 47px; right: 305px; bottom: 39px; color: #fff; font-size: var(--sub-size); line-height: 1.1; font-weight: 900; letter-spacing: .01em; white-space: nowrap; text-shadow: 0 5px 12px #000c; }
+    .avatar-glow { position: absolute; right: -22px; bottom: -87px; width: 388px; height: 380px; border-radius: 50%; background: radial-gradient(ellipse, var(--avatar-glow), transparent 72%); filter: blur(10px); }
+    .avatar { position: absolute; right: 3px; bottom: -101px; width: 290px; height: 348px; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 9px 13px #000d); }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="hero" src="../assets/images/thumbnail-bg.png" alt="">
+    <div class="fade"></div>
+    <div class="accent"></div>
+    <div class="kicker">{{短い前置き}}</div>
+    <h1 class="headline">{{最も伝えたい一言}}</h1>
+    <div class="sub">{{補足や開催期間}}</div>
+    <div class="avatar-glow"></div>
+    <img class="avatar" src="../assets/images/thumbnail-avatar.png" alt="">
+  </div>
+</body>
+</html>

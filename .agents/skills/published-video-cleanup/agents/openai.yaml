@@ -1,0 +1,4 @@
+interface:
+  display_name: "公開済み動画の整理"
+  short_description: "YouTubeで対象動画の存在を確認し、制作記録を残して動画ファイルを整理する"
+  default_prompt: "$published-video-cleanup を使って、指定した公開済み動画の動画ファイルを整理してください。"

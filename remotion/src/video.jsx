@@ -14,7 +14,7 @@ function Background({scene, assets, fps, frame, duration}) {
   const background = scene.background ?? {color: '#101820'};
   const asset = background.asset ? assets[background.asset] : null;
   const fit = background.fit ?? 'cover';
-  const clean = scene.overlays.length === 0;
+  const clean = scene.overlays.length === 0 && !scene.rawBackground;
   if (asset?.kind === 'image') {
     const progress = frame / Math.max(1, duration - 1);
     const zoom = scene.motion?.backgroundZoom ? 1.02 + progress * 0.04 : 1;
@@ -51,23 +51,54 @@ function BackgroundCuts({scene, project, frame, duration}) {
 }
 
 function ImageInset({inset, assets, frame, project}) {
-  const reveal = easeOut(between(frame, 2, 16));
+  const reveal = inset.reveal === false ? 1 : easeOut(between(frame, 2, 16));
   const feature = inset.layout === 'feature';
   const width = inset.width ?? (feature ? 1320 : 950);
   const placement = feature
     ? {left: Math.round((project.width - width) / 2), top: 95}
     : {top: 105, [inset.position === 'left' ? 'left' : 'right']: 80};
   return (
-    <div style={{position: 'absolute', ...placement, width, aspectRatio: '16 / 9', overflow: 'hidden', border: '4px solid #f4f0e7', boxShadow: '0 18px 55px #000b', opacity: reveal, transform: `translateY(${Math.round((1 - reveal) * 28)}px)`}}>
+    <div style={{position: 'absolute', ...placement, width, aspectRatio: inset.aspectRatio ?? 16 / 9, overflow: 'hidden', border: '4px solid #f4f0e7', boxShadow: '0 18px 55px #000b', opacity: reveal, transform: `translateY(${Math.round((1 - reveal) * 28)}px)`}}>
       <Img src={staticFile(assets[inset.asset].src)} style={{width: '100%', height: '100%', objectFit: feature ? 'contain' : 'cover'}} />
     </div>
   );
 }
 
-function Overlay({item, accent, frame, animated, index, avatar, hasInset, opening}) {
+function Overlay({item, accent, frame, duration, animated, index, avatar, hasInset, opening}) {
   const delay = item.type === 'headline' ? 10 : item.type === 'label' ? 4 : 2;
   const progress = animated ? easeOut(between(frame, delay + index * 2, delay + 14 + index * 2)) : 1;
   const enter = {opacity: progress, transform: `translateY(${Math.round((1 - progress) * (item.type === 'headline' ? 45 : 25))}px)`};
+  if (item.type === 'transition') {
+    const fadeIn = easeOut(between(frame, 0, 9));
+    const fadeOut = 1 - easeOut(between(frame, duration - 10, duration - 1));
+    const opacity = Math.min(fadeIn, fadeOut);
+    return <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', pointerEvents: 'none'}}>
+      <div style={{width: 1110, minHeight: 290, boxSizing: 'border-box', border: '6px solid #fff', background: 'rgba(6,14,22,.38)', boxShadow: '0 14px 38px #0008', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', padding: '34px 58px', opacity, transform: `scale(${0.975 + 0.025 * fadeIn})`}}>
+        {item.meta && <div style={{color: '#fff', fontSize: 27, fontWeight: 800, letterSpacing: 5, textShadow: '0 2px 8px #000b', marginBottom: 16}}>{item.meta}</div>}
+        <div style={{color: '#fff', fontSize: item.text.length > 20 ? 65 : item.text.length > 13 ? 75 : 88, lineHeight: 1.17, fontWeight: 900, textAlign: 'center', textShadow: '0 4px 16px #000d', whiteSpace: 'pre-wrap'}}>{item.text}</div>
+      </div>
+    </AbsoluteFill>;
+  }
+  if (item.type === 'intro-title') {
+    const introAccent = item.accentColor ?? '#f05a2a';
+    return <AbsoluteFill style={{pointerEvents: 'none', fontFamily: font}}>
+      <AbsoluteFill style={{background: 'linear-gradient(90deg, rgba(5,6,8,.05) 0%, rgba(5,6,8,.12) 30%, rgba(5,6,8,.43) 51%, rgba(5,6,8,.54) 67%, rgba(5,6,8,.56) 100%)'}} />
+      <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(5,6,8,.56), transparent 26%)'}} />
+      <div style={{position: 'absolute', left: 88, top: 78, padding: '18px 27px', borderRadius: 13, background: introAccent, boxShadow: '0 8px 24px #0008', color: '#fff', fontSize: 30, fontWeight: 900, lineHeight: 1.3, whiteSpace: 'nowrap'}}>{item.badge}</div>
+      <div style={{position: 'absolute', top: 195, right: 91, width: 20, height: 430, background: introAccent}} />
+      <div style={{position: 'absolute', top: 192, left: 885, width: 865, color: '#f8f8f6', textAlign: 'right', opacity: easeOut(between(frame, 2, 20)), textShadow: '0 4px 14px #0007'}}>
+        <div style={{color: introAccent, fontFamily: '"DIN Condensed", "Arial Narrow", sans-serif', fontSize: 30, fontWeight: 700, letterSpacing: 5, marginBottom: 41}}>{item.eyebrow}</div>
+        <div style={{fontSize: 65, fontWeight: 800, letterSpacing: '-.07em', lineHeight: 1.31, whiteSpace: 'nowrap'}}>{item.line1}</div>
+        <div style={{fontSize: 94, fontWeight: 900, letterSpacing: '-.075em', lineHeight: 1.32, whiteSpace: 'nowrap'}}>{item.line2}</div>
+        <div style={{fontSize: 146, fontWeight: 900, letterSpacing: '-.05em', lineHeight: 1.14, whiteSpace: 'nowrap'}}>{item.count}</div>
+      </div>
+      <div style={{position: 'absolute', top: 686, right: 420, width: 750, textAlign: 'right', whiteSpace: 'nowrap'}}>
+        <div style={{width: 160, height: 2, background: '#757a81', margin: '0 0 20px auto'}} />
+        <div style={{color: introAccent, fontSize: 25, fontWeight: 900, letterSpacing: '.06em', lineHeight: 1.3, textShadow: '0 2px 9px #000'}}>{item.periodLabel}</div>
+        <div style={{color: '#c8c9cc', fontSize: 26, fontWeight: 700, letterSpacing: '-.025em', lineHeight: 1.5, marginTop: 4, textShadow: '0 2px 9px #000'}}>{item.periodText}</div>
+      </div>
+    </AbsoluteFill>;
+  }
   if (['statement', 'question', 'stat', 'steps', 'pair'].includes(item.type)) {
     const left = 66;
     const right = avatar ? 435 : 66;
@@ -128,7 +159,7 @@ function Overlay({item, accent, frame, animated, index, avatar, hasInset, openin
     return (
       <div style={{position: 'absolute', top: 58, left: 66, maxWidth: 1000, background: 'rgba(8,16,24,.84)', borderLeft: `10px solid ${accent}`, padding: '20px 27px', boxShadow: '0 8px 30px #0006', ...enter}}>
         <div style={{fontSize: 38, fontWeight: 900, color: '#fff'}}>{item.text}</div>
-        {item.meta && <div style={{fontSize: 22, fontWeight: 700, color: '#d3dee5', marginTop: 8}}>{item.meta}</div>}
+        {item.meta && <div style={{fontSize: item.sectionGame ? 31 : 22, fontWeight: item.sectionGame ? 900 : 700, color: item.sectionGame ? '#fff' : '#d3dee5', marginTop: 8}}>{item.meta}{item.discount && <span style={{color: '#ff5454'}}>（{item.discount}）</span>}</div>}
       </div>
     );
   }
@@ -174,6 +205,12 @@ function NarrationMouth({src, persona, frame, fps, style}) {
   return <Img src={staticFile(`pelsona/${persona}/mouth_${state}.png`)} style={style} />;
 }
 
+function CachedNarrationMouth({narration, persona, frame, fps, style}) {
+  const cachedFrame = Math.floor(frame * narration.mouthFps / fps);
+  const state = {o: 'open', h: 'half', c: 'closed'}[narration.mouthFrames[cachedFrame]] ?? 'closed';
+  return <Img src={staticFile(`pelsona/${persona}/mouth_${state}.png`)} style={style} />;
+}
+
 function Avatar({persona, narration, project, frame, visibleFrame}) {
   const height = Math.round(project.height * 0.36);
   const width = Math.round(height * 1186 / 1327);
@@ -181,8 +218,10 @@ function Avatar({persona, narration, project, frame, visibleFrame}) {
   return (
     <div style={{position: 'absolute', right: Math.round(project.width * 0.02), bottom: 0, width, height, opacity: easeOut(between(visibleFrame, 0, 9)), pointerEvents: 'none'}}>
       <Img src={staticFile(`pelsona/${persona}/base.png`)} style={imageStyle} />
-      {narration
-        ? <NarrationMouth src={staticFile(narration.src)} persona={persona} frame={frame} fps={project.fps} style={imageStyle} />
+      {narration && !project.previewStaticAvatar
+        ? narration.mouthFrames
+          ? <CachedNarrationMouth narration={narration} persona={persona} frame={frame} fps={project.fps} style={imageStyle} />
+          : <NarrationMouth src={staticFile(narration.src)} persona={persona} frame={frame} fps={project.fps} style={imageStyle} />
         : <Img src={staticFile(`pelsona/${persona}/mouth_closed.png`)} style={imageStyle} />}
     </div>
   );
@@ -207,8 +246,39 @@ function PersistentAvatar({project}) {
   return null;
 }
 
+function activeChapterTransition(project, frame) {
+  if (!project.chapterTransition) return null;
+  let start = 0;
+  let previousLabel = null;
+  let previousSceneLabel = null;
+  let majorNumber = 0;
+  for (const scene of project.scenes) {
+    const label = scene.chapterLabel ?? null;
+    const changed = Boolean(label && previousLabel && label !== previousLabel);
+    const major = changed && scene.chapterStart === true;
+    if (major) majorNumber++;
+    const duration = framesFor(major
+      ? project.chapterTransition.durationSeconds
+      : (project.chapterTransition.minorDurationSeconds ?? 0.24), project.fps);
+    if (changed && frame >= start && frame < start + duration) {
+      return {label, previousLabel: previousSceneLabel, local: frame - start, duration, major, majorNumber};
+    }
+    start += framesFor(sceneSeconds(scene, project), project.fps);
+    if (start > frame) break;
+    // A raw gameplay scene has no visible chapter label. Keep the last named
+    // chapter so the next silent title can still enter as a major transition.
+    previousSceneLabel = label;
+    if (label) previousLabel = label;
+  }
+  return null;
+}
+
+function ChapterLabel({label, accent, opacity = 1}) {
+  return <div style={{position: 'absolute', top: 0, left: 0, maxWidth: 900, padding: '10px 26px 12px 22px', background: 'rgba(33,37,40,.94)', borderLeft: `12px solid ${accent}`, color: '#fff', fontFamily: font, fontSize: 40, lineHeight: 1.2, fontWeight: 900, boxShadow: '0 5px 18px #0009', opacity, pointerEvents: 'none'}}>{label}</div>;
+}
+
 function activeChapterIntro(project, frame) {
-  if (!project.chapterIntro) return null;
+  if (!project.chapterIntro || project.chapterTransition) return null;
   const introFrames = framesFor(project.chapterIntro.durationSeconds, project.fps);
   let start = 0;
   for (const scene of project.scenes) {
@@ -225,15 +295,43 @@ function activeChapterIntro(project, frame) {
 function PersistentChapter({project}) {
   const frame = useCurrentFrame();
   if (activeChapterIntro(project, frame)) return null;
+  const transition = activeChapterTransition(project, frame);
+  const accent = project.theme?.accent ?? '#f6c84c';
+  if (transition) {
+    const {label, previousLabel, local, duration, major} = transition;
+    const exitFrames = Math.min(8, Math.max(3, Math.floor(duration * 0.4)));
+    const enterStart = major ? duration - 8 : Math.max(1, exitFrames - 2);
+    return <>
+      {previousLabel && <ChapterLabel label={previousLabel} accent={accent} opacity={1 - easeOut(between(local, 0, exitFrames))} />}
+      <ChapterLabel label={label} accent={accent} opacity={easeOut(between(local, enterStart, duration - 1))} />
+    </>;
+  }
   let start = 0;
   for (const scene of project.scenes) {
     start += framesFor(sceneSeconds(scene, project), project.fps);
     if (frame >= start) continue;
     if (!scene.chapterLabel) return null;
-    const accent = project.theme?.accent ?? '#f6c84c';
-    return <div style={{position: 'absolute', top: 0, left: 0, maxWidth: 900, padding: '10px 26px 12px 22px', background: 'rgba(33,37,40,.94)', borderLeft: `12px solid ${accent}`, color: '#fff', fontFamily: font, fontSize: 40, lineHeight: 1.2, fontWeight: 900, boxShadow: '0 5px 18px #0009', pointerEvents: 'none'}}>{scene.chapterLabel}</div>;
+    return <ChapterLabel label={scene.chapterLabel} accent={accent} />;
   }
   return null;
+}
+
+function ChapterTransition({project}) {
+  const frame = useCurrentFrame();
+  const transition = activeChapterTransition(project, frame);
+  if (!transition?.major) return null;
+  const {label, local, duration, majorNumber} = transition;
+  const enterFrames = Math.max(1, Math.round(project.fps * 0.28));
+  const exitFrames = Math.max(1, Math.round(project.fps * 0.3));
+  const enter = easeOut(between(local, 0, enterFrames));
+  const exit = 1 - easeOut(between(local, duration - exitFrames, duration - 1));
+  const visibility = Math.min(enter, exit);
+  return <AbsoluteFill style={{fontFamily: font, pointerEvents: 'none'}}>
+    <div style={{position: 'absolute', left: '50%', top: '46%', width: 1130, minHeight: 254, boxSizing: 'border-box', opacity: visibility, transform: `translate(-50%, -50%) scale(${0.97 + enter * 0.03})`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '32px 48px 39px', background: `rgba(4,14,24,${project.chapterTransition.cardOpacity ?? 0.29})`, border: '5px solid #fff', boxShadow: '0 14px 36px #0006'}}>
+      <div style={{color: '#fff', fontSize: 27, fontWeight: 900, letterSpacing: 5, textShadow: '0 3px 8px #000b'}}>{String(majorNumber).padStart(2, '0')}</div>
+      <div style={{maxWidth: '100%', color: '#fff', fontSize: label.length > 9 ? 67 : 76, lineHeight: 1.17, fontWeight: 900, textAlign: 'center', textShadow: '0 4px 12px #000c'}}>{label}</div>
+    </div>
+  </AbsoluteFill>;
 }
 
 function ChapterIntro({project}) {
@@ -284,11 +382,11 @@ function EndRoll({scene, frame, duration, project}) {
   const finalStart = duration - finalFrames;
   const reveal = easeOut(between(frame, finalStart, finalStart + Math.round(0.6 * project.fps)));
   return <>
-    <Audio
+    {!project.endingSoundtrack && <Audio
       src={staticFile(project.assets[musicAsset].src)}
       loop
       volume={(audioFrame) => musicVolume * Math.min(1, audioFrame / project.fps) * Math.max(0, Math.min(1, (duration - audioFrame) / (2 * project.fps)))}
-    />
+    />}
     {frame >= finalStart && <AbsoluteFill style={{pointerEvents: 'none'}}>
       <AbsoluteFill style={{background: 'rgba(4,8,12,.38)', opacity: reveal}} />
       <div style={{position: 'absolute', left: 78, right: 430, bottom: 82, color: '#fff', fontSize: 58, lineHeight: 1.25, fontWeight: 900, WebkitTextStroke: '4px #101820', paintOrder: 'stroke fill', textShadow: '0 6px 20px #000e', opacity: reveal, transform: `translateY(${Math.round((1 - reveal) * 18)}px)`}}>{headline}</div>
@@ -299,20 +397,25 @@ function EndRoll({scene, frame, duration, project}) {
 function ContinuousBackground({project, length}) {
   const playlist = project.backgroundPlaylist;
   if (!playlist) return null;
+  const playlistLength = project.backgroundPlaylistEndAtSeconds === undefined
+    ? length
+    : Math.min(length, Math.round(project.backgroundPlaylistEndAtSeconds * project.fps));
   const segments = [];
   let start = 0;
-  for (let index = 0; start < length; index++) {
+  for (let index = 0; start < playlistLength; index++) {
     const clip = playlist[index % playlist.length];
-    const duration = Math.min(length - start, Math.max(1, Math.floor(clip.durationSeconds * project.fps)));
+    const duration = Math.min(playlistLength - start, Math.max(1, Math.floor(clip.durationSeconds * project.fps)));
     segments.push(<Sequence key={`${clip.asset}-${index}`} from={start} durationInFrames={duration}>
       <Video src={staticFile(project.assets[clip.asset].src)} trimBefore={Math.round((clip.trimStartSeconds ?? 0) * project.fps)} muted volume={0} objectFit="cover" style={{width: '100%', height: '100%', filter: 'brightness(1.08) contrast(1.03)'}} />
     </Sequence>);
     start += duration;
   }
-  return <AbsoluteFill>
+  return <Sequence from={0} durationInFrames={playlistLength}>
+    <AbsoluteFill>
     {segments}
     <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(4,8,12,.1), rgba(4,8,12,.02) 55%, rgba(4,8,12,.48))', pointerEvents: 'none'}} />
-  </AbsoluteFill>;
+    </AbsoluteFill>
+  </Sequence>;
 }
 
 function Scene({scene, project}) {
@@ -322,13 +425,14 @@ function Scene({scene, project}) {
   const narration = scene.narration?.asset ? project.assets[scene.narration.asset] : null;
   const edgeFade = scene.motion?.fadeEdges ? Math.max(1 - between(frame, 0, 8), between(frame, duration - 9, duration - 1)) : 0;
   const sceneBackground = !project.backgroundPlaylist || Boolean(scene.background || scene.backgroundCuts);
+  const chapterIntroFrames = project.chapterTransition ? 0 : framesFor(project.chapterIntro?.durationSeconds ?? 0, project.fps);
   return (
     <AbsoluteFill style={{fontFamily: font, overflow: 'hidden', background: sceneBackground ? '#101820' : 'transparent'}}>
       {sceneBackground && (scene.backgroundCuts
         ? <BackgroundCuts scene={scene} project={project} frame={frame} duration={duration} />
         : <Background scene={scene} assets={project.assets} fps={project.fps} frame={frame} duration={duration} />)}
       {scene.chapterLabel && project.chapterPlacement !== 'top-left-fixed' && <div style={{position: 'absolute', top: 54, left: 66, padding: '11px 18px', background: 'rgba(8,16,24,.83)', borderLeft: `6px solid ${accent}`, color: '#fff', fontSize: 27, fontWeight: 900, boxShadow: '0 5px 16px #0007'}}>{scene.chapterLabel}</div>}
-      {scene.inset && (!scene.chapterStart || frame >= framesFor(project.chapterIntro?.durationSeconds ?? 0, project.fps)) && <ImageInset inset={scene.inset} assets={project.assets} frame={frame - (scene.chapterStart ? framesFor(project.chapterIntro?.durationSeconds ?? 0, project.fps) : 0)} project={project} />}
+      {scene.inset && (!scene.chapterStart || frame >= chapterIntroFrames) && <ImageInset inset={scene.inset} assets={project.assets} frame={frame - (scene.chapterStart ? chapterIntroFrames : 0)} project={project} />}
       {(scene.insetSegments ?? []).map((inset, index) => {
         const from = Math.round(inset.atSeconds * project.fps);
         const length = Math.min(duration - from, Math.round(inset.durationSeconds * project.fps));
@@ -336,7 +440,7 @@ function Scene({scene, project}) {
           <ImageInset inset={inset} assets={project.assets} frame={frame - from} project={project} />
         </Sequence>;
       })}
-      {scene.overlays.map((item, index) => <Overlay key={`${item.type}-${index}`} item={item} accent={accent} frame={frame} animated={scene.motion?.textEntrance} index={index} avatar={scene.avatar} hasInset={Boolean(scene.inset || scene.insetSegments?.length)} opening={scene.id === 'opening-01'} />)}
+      {scene.overlays.map((item, index) => <Overlay key={`${item.type}-${index}`} item={item} accent={accent} frame={frame} duration={duration} animated={scene.motion?.textEntrance} index={index} avatar={scene.avatar} hasInset={Boolean(scene.inset || scene.insetSegments?.length)} opening={scene.id === 'opening-01'} />)}
       <EndRoll scene={scene} frame={frame} duration={duration} project={project} />
       {project.captions?.mode === 'spoken' && narration && scene.narration.text && <NarrationCaption text={scene.narration.text} durationSeconds={narration.durationSeconds} fps={project.fps} sceneFrames={duration} frame={frame} avatar={scene.avatar} />}
       {narration && <Audio src={staticFile(narration.src)} volume={scene.narration.volume ?? 1} />}
@@ -355,6 +459,12 @@ export function IndieVideo(project) {
   const frame = useCurrentFrame();
   const soundtrack = project.soundtrack;
   const length = totalFrames(project);
+  let elapsed = 0;
+  const silentTransitions = project.scenes.flatMap((scene) => {
+    const start = elapsed;
+    elapsed += framesFor(sceneSeconds(scene, project), project.fps);
+    return scene.overlays.some((overlay) => overlay.type === 'transition') ? [{start, end: elapsed}] : [];
+  });
   const musicVolume = soundtrack && ((frame) => {
     const fadeIn = (soundtrack.fadeInSeconds ?? 0) * project.fps;
     const fadeOut = (soundtrack.fadeOutSeconds ?? 0) * project.fps;
@@ -363,12 +473,37 @@ export function IndieVideo(project) {
       : Math.min(length, Math.round(soundtrack.endAtSeconds * project.fps));
     const start = fadeIn > 0 ? Math.min(1, frame / fadeIn) : 1;
     const end = fadeOut > 0 ? Math.min(1, (musicEnd - 1 - frame) / fadeOut) : frame < musicEnd ? 1 : 0;
-    return (soundtrack.volume ?? 0.12) * Math.max(0, Math.min(start, end));
+    const transitionGain = soundtrack.muteDuringTransitions
+      ? silentTransitions.reduce((gain, range) => {
+        const ramp = Math.max(1, Math.round(project.fps * 0.15));
+        if (frame >= range.start && frame < range.end) return 0;
+        if (frame < range.start && frame >= range.start - ramp) return Math.min(gain, (range.start - frame) / ramp);
+        if (frame >= range.end && frame < range.end + ramp) return Math.min(gain, (frame - range.end) / ramp);
+        return gain;
+      }, 1)
+      : 1;
+    return (soundtrack.volume ?? 0.12) * Math.max(0, Math.min(start, end)) * transitionGain;
+  });
+  const endingSoundtrack = project.endingSoundtrack;
+  const endingMusicStart = endingSoundtrack
+    ? project.scenes.slice(0, project.scenes.findIndex((scene) => scene.id === endingSoundtrack.startSceneId))
+      .reduce((sum, scene) => sum + framesFor(sceneSeconds(scene, project), project.fps), 0)
+    : 0;
+  const endingMusicVolume = endingSoundtrack && ((audioFrame) => {
+    const fadeIn = (endingSoundtrack.fadeInSeconds ?? 0) * project.fps;
+    const fadeOut = (endingSoundtrack.fadeOutSeconds ?? 0) * project.fps;
+    const duration = length - endingMusicStart;
+    const enter = fadeIn > 0 ? Math.min(1, audioFrame / fadeIn) : 1;
+    const exit = fadeOut > 0 ? Math.min(1, (duration - 1 - audioFrame) / fadeOut) : 1;
+    return (endingSoundtrack.volume ?? 0.12) * Math.max(0, Math.min(enter, exit));
   });
   return (
     <AbsoluteFill style={{background: '#101820'}}>
       <ContinuousBackground project={project} length={length} />
       {soundtrack && <Audio src={staticFile(project.assets[soundtrack.asset].src)} loop={soundtrack.loop ?? true} volume={musicVolume} />}
+      {endingSoundtrack && <Sequence from={endingMusicStart} durationInFrames={length - endingMusicStart}>
+        <Audio src={staticFile(project.assets[endingSoundtrack.asset].src)} loop={endingSoundtrack.loop ?? true} volume={endingMusicVolume} />
+      </Sequence>}
       <Series>
         {project.scenes.map((scene) => (
           <Series.Sequence key={scene.id} durationInFrames={framesFor(sceneSeconds(scene, project), project.fps)} name={scene.id}>
@@ -377,6 +512,7 @@ export function IndieVideo(project) {
         ))}
       </Series>
       <ChapterIntro project={project} />
+      <ChapterTransition project={project} />
       {project.persona && <PersistentAvatar project={project} />}
       {project.chapterPlacement === 'top-left-fixed' && <PersistentChapter project={project} />}
       <AbsoluteFill style={{backgroundColor: '#050607', opacity: between(frame, length - Math.round(project.fps * 0.65), length - 1), pointerEvents: 'none'}} />
