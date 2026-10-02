@@ -61,7 +61,9 @@ PYTHONPATH=speech/src python3 -m indie_narration --engine aivis synthesize \
 
 ## 動画を作る
 
-映像の準備、素材の追加、プレビュー、MP4 書き出しは [remotion/README.md](remotion/README.md) を参照してください。動画ごとに `VIDEO.md`、`SCRIPT.md`、`project.json`、素材の原本を [projects/](projects/README.md) にまとめます。用途別のひな形は [templates/](templates/README.md) にあります。`00000000-demo/` 以外の動画プロジェクトはローカル専用で、Gitには含めません。共通素材の原本は [assets/](assets/README.md) に置きます。場面を追加するたびに途中版を確認できます。手持ちの動画・画像と生成画像を同じように背景素材として使えます。
+映像の準備、素材の追加、プレビュー、MP4 書き出しは [remotion/README.md](remotion/README.md) を参照してください。動画ごとに `VIDEO.md`、`SCRIPT.md`、`project.json`、素材の原本を [projects/](projects/README.md) にまとめます。用途別のひな形は [templates/](templates/README.md) にあります。`00000000-demo/` 以外の動画プロジェクトは公開リポジトリには含めません。共通素材の原本は [assets/](assets/README.md) に置きます。場面を追加するたびに途中版を確認できます。手持ちの動画・画像と生成画像を同じように背景素材として使えます。
+
+個別プロジェクトの記録と画像・音声は、動画を除いて別の非公開リポジトリへ保存できます。初期設定と `git private-push` の使い方は [公開フレームと非公開の制作記録](docs/private-sync.md) を参照してください。
 
 制作を支援するエージェントの進め方は [AGENTS.md](AGENTS.md) に記録しています。新規動画では最初にテンプレートを提案し、スクリーンショットは候補画像を見せて表示箇所を確認してから採用します。
 
