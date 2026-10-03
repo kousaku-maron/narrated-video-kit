@@ -1,3 +1,5 @@
+import {validatePriceLabel} from './pricing.js';
+
 export const framesFor = (seconds, fps) => Math.max(1, Math.ceil(seconds * fps));
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -263,8 +265,18 @@ export function validateProject(project) {
       }
     }
     if (scene.narration !== undefined && !isObject(scene.narration)) throw new Error(`Scene ${scene.id}: narration must be an object`);
+    for (const key of ['text', 'speechText']) {
+      if (scene.narration?.[key] !== undefined && (typeof scene.narration[key] !== 'string' || !scene.narration[key].trim())) {
+        throw new Error(`Scene ${scene.id}: narration.${key} must be nonempty text`);
+      }
+    }
     if (scene.narration?.asset && project.assets[scene.narration.asset]?.kind !== 'audio') {
       throw new Error(`Scene ${scene.id}: narration asset must be audio`);
+    }
+    const audio = project.assets[scene.narration?.asset];
+    if ((audio?.narrationText !== undefined && audio.narrationText !== scene.narration.text) ||
+        (audio?.speechText !== undefined && audio.speechText !== scene.narration.speechText)) {
+      throw new Error(`Scene ${scene.id}: narration audio metadata is stale; regenerate the WAV`);
     }
     if (scene.narration?.volume !== undefined && (!Number.isFinite(scene.narration.volume) || scene.narration.volume < 0 || scene.narration.volume > 1)) {
       throw new Error(`Scene ${scene.id}: narration volume must be 0–1`);
@@ -289,6 +301,17 @@ export function validateProject(project) {
       }
       if (typeof overlay.text !== 'string' || !overlay.text.trim()) {
         throw new Error(`Scene ${scene.id}: overlay text is required`);
+      }
+      if (overlay.price !== undefined) {
+        if (overlay.type !== 'label') throw new Error(`Scene ${scene.id}: price is only supported on label overlays`);
+        validatePriceLabel(overlay, scene, project);
+      } else if (overlay.announcePrice !== undefined) {
+        throw new Error(`Scene ${scene.id}: announcePrice requires structured price`);
+      }
+      if (overlay.type === 'transition' && (scene.narration !== undefined || (scene.background?.volume ?? 0) > 0 ||
+          scene.backgroundCuts?.some((cut) => (cut.volume ?? 0) > 0) ||
+          scene.overlays.some((item) => item.type === 'caption'))) {
+        throw new Error(`Scene ${scene.id}: transition must not contain narration, captions, or trailer audio`);
       }
       if (overlay.type === 'intro-title') {
         for (const key of ['badge', 'eyebrow', 'line1', 'line2', 'count', 'periodLabel', 'periodText']) {

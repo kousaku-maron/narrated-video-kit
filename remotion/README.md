@@ -64,7 +64,7 @@ npm run final -- 20260928-my-game
 }
 ```
 
-`narration.text` は原稿の記録用です。画面に表示する文字は `overlays` に別に書くので、表示名「Invokyr」と読み「インボキア」を使い分けられます。`durationSeconds` を指定すると場面の長さを固定できます。省略した場合は登録した WAV の長さに `padAfterSeconds`（既定 0.4 秒）を足します。
+`narration.text` は字幕表示用の原稿で、日時・人数・数量・価格はアラビア数字にします。`narration.speechText` はTTSへ渡した読み上げ文です。共通の読み処理で表示名と読みを分離します（[音声ツール](../speech/README.md)）。`captions.mode: "spoken"` の焼き込み字幕とSRTは同じ `text` を使い、熟語を保持して数量だけを正規化します。`durationSeconds` を指定すると場面の長さを固定できます。省略した場合は登録した WAV の長さに `padAfterSeconds`（既定 0.4 秒）を足します。
 
 セール紹介などで `intro-title` を使う場合、`text` に加えて `badge`、`eyebrow`、`line1`、`line2`、`count`、`periodLabel`、`periodText` を指定します。`accentColor` は任意の6桁HEX色です。これらの文言は `project.json` から差し替えられます。配置と使用例は [セール紹介テンプレート](../templates/steam-sale-picks/VISUALS.md) を参照してください。
 
@@ -108,10 +108,10 @@ node scripts/export-subtitles.mjs 20260928-my-game out/20260928-my-game/subtitle
 
 動画の後半で別の収録音声に切り替える場合は、`soundtrack.endAtSeconds` にBGMを止める動画全体の秒数を指定できます。`fadeOutSeconds` はその時刻より前に適用されます。
 
-長い実プレイ映像の後でBGMを再開する場合は、再開する無声タイトル場面を `endingSoundtrack.startSceneId` に指定します。指定した場面から動画の最後まで同じ曲を連続再生し、最初と最後にフェードを付けられます。
+長い実プレイ映像の後でBGMを再開する場合は、再開するまとめの語りの場面を `endingSoundtrack.startSceneId` に指定します。冒頭・締めの入口にトランジションを足さず、指定した場面から動画の最後まで同じ曲を連続再生し、最初と最後にフェードを付けられます。
 
 ```json
-"endingSoundtrack": {"asset": "music-01", "startSceneId": "transition-ending", "volume": 0.12, "loop": true, "fadeInSeconds": 1, "fadeOutSeconds": 2}
+"endingSoundtrack": {"asset": "music-01", "startSceneId": "ending", "volume": 0.12, "loop": true, "fadeInSeconds": 1, "fadeOutSeconds": 2}
 ```
 
 場面には次の項目を追加できます。
@@ -156,3 +156,20 @@ PYTHONPATH=speech/src python3 -m indie_narration --engine aivis synthesize \
 ```
 
 その後 `cd remotion` して `npm run project -- add 20260928-my-game ../work/voice-01.wav --id voice-01 --origin aivis` で取り込みます。原稿、素材、場面を少しずつ足すことで途中版を育てられます。
+
+読み辞書・`speechText` と生成メタデータの取り込み方は [speech/README.md](../speech/README.md) を参照してください。`--voice-metadata voice-01.json` は原稿・読み・話者・話速・WAVハッシュを音声素材へ登録します。場面の `narration.text` / `speechText` を生成結果と揃えると、`check` が原稿の変更漏れとWAVの不一致を検出します。
+
+## 価格と投稿記録
+
+セール紹介の価格ラベルは `price.status: sale | regular | unreleased | unknown` で分岐します。確認済み割引は通常額を取消線にし、販売価格と率を表示します。`sale` / `regular` には日本向けの価格、Steam公式ストアURL、タイムゾーン付き確認日時を保存します。紹介冒頭の割引は語り・字幕・チップと音声生成メタデータを照合し、未確認の価格や率を使いません。設定例は [セールの画面仕様](../templates/steam-sale-picks/VISUALS.md) を参照してください。従来の価格以外の `label.meta` は引き続き使えます。
+
+`init` は新規フォルダに `publish/title.txt`・`description.txt`・`tags.txt` と `upload-record.json` を作ります。公開記録は最新YouTube ID・URL、アップロード／予約／公開のJST日時、実際の設定とチェック結果を記入します。既存プロジェクトの公開設定は自動変更しません。詳しくは [projects/README.md](../projects/README.md) を参照してください。
+
+## 検証
+
+```sh
+npm test
+npm run check -- 00000000-demo
+```
+
+JSとPythonは同じ数字表記fixtureを使い、字幕の表示とSRT、熟語保持、読み分離、価格の分岐・不一致、無声トランジション、音声メタデータを検証します。専用lint・TypeScript型チェックは未導入です。JS構文チェックとRemotionバンドル／代表描画で別途確認します。

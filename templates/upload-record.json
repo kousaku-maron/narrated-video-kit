@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "latestYouTubeId": null,
+  "youtubeUrl": null,
+  "uploadedAtJst": null,
+  "scheduledPublishAtJst": null,
+  "publishedAtJst": null,
+  "settings": {
+    "visibility": null,
+    "madeForKids": null,
+    "language": null,
+    "category": null,
+    "license": null,
+    "notifySubscribers": null,
+    "allowEmbedding": null,
+    "comments": null
+  },
+  "files": {
+    "video": "final.mp4",
+    "title": "title.txt",
+    "description": "description.txt",
+    "tags": "tags.txt",
+    "thumbnail": "thumbnail.png",
+    "thumbnailSource": "thumbnail.html",
+    "subtitles": "subtitles.srt"
+  },
+  "uploadedVideoSha256": null,
+  "checks": {
+    "scriptAudioSubtitles": {"status": "pending", "checkedAtJst": null, "note": null},
+    "prices": {"status": "pending", "checkedAtJst": null, "note": null},
+    "chapters": {"status": "pending", "checkedAtJst": null, "note": null},
+    "thumbnail": {"status": "pending", "checkedAtJst": null, "note": null},
+    "requiredAttribution": {"status": "pending", "checkedAtJst": null, "note": null},
+    "youtubeSettings": {"status": "pending", "checkedAtJst": null, "note": null},
+    "playback": {"status": "pending", "checkedAtJst": null, "note": null}
+  }
+}

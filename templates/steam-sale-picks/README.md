@@ -15,6 +15,7 @@ cp templates/steam-sale-picks/SCRIPT.md projects/YYYYMMDD-sale-topic/SCRIPT.md
 cp templates/steam-sale-picks/VISUALS.md projects/YYYYMMDD-sale-topic/notes/VISUALS.md
 cp templates/steam-sale-picks/SALE_CHECK.md projects/YYYYMMDD-sale-topic/notes/SALE_CHECK.md
 cp templates/steam-sale-picks/PUBLISH.md projects/YYYYMMDD-sale-topic/publish/PUBLISH.md
+cp templates/upload-record.json projects/YYYYMMDD-sale-topic/publish/upload-record.json
 cp templates/steam-sale-picks/thumbnail.html projects/YYYYMMDD-sale-topic/publish/thumbnail.html
 ```
 
@@ -26,7 +27,7 @@ cp templates/steam-sale-picks/thumbnail.html projects/YYYYMMDD-sale-topic/publis
 | `SCRIPT.md` | 語りと場面順。各作品で「遊びの核・友と楽しむ点・好みが分かれる点」を語る |
 | `notes/SALE_CHECK.md` | セール日程、作品ごとの価格・割引・確認時刻と根拠 |
 | `notes/VISUALS.md` | トレーラー背景、価格チップ、無声トランジション、タイトル画面 |
-| `publish/PUBLISH.md` | 投稿タイトル、説明文、チャプター、クレジット、ハッシュタグ、タグ欄 |
+| `publish/PUBLISH.md` | 投稿タイトル、説明文、チャプター、公式ストア、ハッシュタグ、映像出典、必須表記、タグ欄 |
 | `publish/thumbnail.html` | タイトル画面に合わせたサムネイルの編集原稿 |
 
 素材の出典と利用条件はプロジェクトの `assets/SOURCES.md`、場面の実装は `project.json` に記録する。サムネイル用の背景画像は `assets/images/thumbnail-bg.png` に置き、HTMLの色・文字・パスを編集して `publish/thumbnail.png` を1280×720で書き出す。320×180でも主題が読めるか確認する。
@@ -41,10 +42,10 @@ cp templates/steam-sale-picks/thumbnail.html projects/YYYYMMDD-sale-topic/publis
 
 ## 映像の型
 
-冒頭ではセール期間と企画の範囲を示し、選んだ作品のトレーラーを背景にタイトルを重ねる。各作品ではその作品のトレーラーを流し、左上に作品名と価格を表示する。語りの終わりに短い余韻を置き、次の作品の背景映像へ切り替えて中央に白枠と作品名を約2.4秒表示する。トランジション中はナレーションを止め、BGMを続ける。個人的に気になる作品の章は任意。まとめの見出しは「まとめ」だけにする。
+冒頭ではセール期間と企画の範囲を示し、選んだ作品のトレーラーを背景にタイトルを重ねる。各作品ではその作品のトレーラーを流し、左上に作品名と価格を表示する。語りの終わりに短い余韻を置き、次の作品の背景映像へ切り替えて中央に白枠と作品名を約2.4秒表示する。トランジション中はナレーションを止め、BGMを続ける。個人的に気になる作品の章は任意。まとめは短く締め、冒頭とまとめの入口にトランジションは置かない。
 
 `intro-title` のチップ・見出し・開催期間は `project.json` のオーバーレイ項目から指定できる。具体例と価格チップの書き方は [VISUALS.md](VISUALS.md) を参照する。作品の予告映像だけで十分伝わる場合はスクリーンショットを足さない。必要な画像は、画像そのもの・表示箇所・理由を投稿者に見せて確認後に採用する。
 
 ## 完成物
 
-`publish/` には `final.mp4`、`subtitles.srt`、`thumbnail.png`、`thumbnail.html`、`PUBLISH.md` を置く。試写や旧版は `work/`。台本を変更したら `project.json` の `narration.text`、音声、字幕も更新する。投稿直前の確認結果と時刻を `notes/SALE_CHECK.md` に残す。
+`publish/` には `final.mp4`、`subtitles.srt`、`thumbnail.png`、`thumbnail.html`、`title.txt`、`description.txt`、`tags.txt`、`PUBLISH.md`、`upload-record.json` を置く。試写や旧版は `work/`。台本を変更したら `project.json` の `narration.text`（字幕用）と `narration.speechText`（TTS用）、音声と生成メタデータ、字幕も更新する。投稿直前の確認結果と時刻を `notes/SALE_CHECK.md` に残す。

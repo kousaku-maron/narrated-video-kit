@@ -30,8 +30,8 @@
 - `SCRIPT.md`：確定した読み上げ文と場面順。
 - `notes/`：画面設計、参考資料、調査や制作メモ。
 - `assets/SOURCES.md`：素材の出典と取得メモ。
-- `project.json`：Remotionが読む場面・尺・素材IDの基準。台本を変えたら `narration.text` と音声も揃える。
-- `publish/`：投稿に使う最終動画・字幕・サムネイル・投稿文と、採用版のサムネイル編集原稿 `thumbnail.html`。試写・試作・旧版は `work/` に置く。
+- `project.json`：Remotionが読む場面・尺・素材IDの基準。台本を変えたら字幕用 `narration.text`、TTS用 `narration.speechText`、音声と生成メタデータも揃える。
+- `publish/`：投稿に使う最終動画・字幕・サムネイル・投稿文と、採用版のサムネイル編集原稿 `thumbnail.html`。`title.txt`・`description.txt`・`tags.txt` と `upload-record.json`（最新YouTube ID・JST日時・設定・実際のチェック結果）も揃える。試写・試作・旧版は `work/` に置く。
 
 `VIDEO.md` は現行の方針・制作状態を示す。過去の構成案や試写メモを残す場合は、冒頭に作成時点と「旧案」を明示し、現行の `VIDEO.md`・`SCRIPT.md` または実時刻のメモへリンクする。採用済みの修正と矛盾する「回答待ち」「後で追加」を現行仕様として残さない。
 

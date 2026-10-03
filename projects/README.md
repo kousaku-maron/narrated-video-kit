@@ -19,7 +19,11 @@ projects/YYYYMMDD-name/
       music/               この動画で使うBGM
       sfx/                 効果音
   publish/
-    PUBLISH.md             投稿用タイトル・説明文
+    PUBLISH.md             投稿方針と公開記録の書き方
+    title.txt              採用タイトル
+    description.txt        貼り付け用説明文
+    tags.txt               タグ欄
+    upload-record.json     最新YouTube ID・日時JST・設定・チェック結果
     thumbnail.html         サムネイルの編集用原稿（必要な場合）
     thumbnail.png          完成サムネイル（必要な場合）
     final.mp4              完成動画（書き出し後）
@@ -37,7 +41,9 @@ projects/YYYYMMDD-name/
 
 `00000000-demo/` は構成と操作を確認できる完成例として公開Gitで管理します。手順は [00000000-demo/VIDEO.md](00000000-demo/VIDEO.md) を参照してください。それ以外の動画プロジェクトは公開Gitの対象外です。台本・設定・画像・音声などは、[私用同期](../docs/private-sync.md) を設定して `git private-push` で非公開リポジトリへ保存できます。動画は両方の保存先で対象外（公開デモの既存動画を除く）で、制作中だけローカルで保持します。
 
-台本を変更したら `project.json` の `narration.text` と対応する音声を揃えます。`VIDEO.md` は現行の方針を短く保ち、変更履歴や調査メモは `notes/` に分けます。Remotionが自動で読むのは `project.json` です。
+台本を変更したら `project.json` の字幕用 `narration.text`、TTS用 `narration.speechText` と対応する音声・生成メタデータを揃えます。`VIDEO.md` は現行の方針を短く保ち、変更履歴や調査メモは `notes/` に分けます。Remotionが自動で読むのは `project.json` です。
+
+投稿文は紹介 → 必要な場合のみセール情報 → チャプター → 公式Steamストア → ハッシュタグ → 映像出典の順にします。任意の音声・BGMクレジットは加えず、素材ごとの必須表記は保持します。`upload-record.json` は最新YouTube ID・URL、日時（`+09:00`、JST）、実際の設定とチェック結果を記録し、未確認は `null` / `pending` のままにします。
 
 ## 公開後の整理
 

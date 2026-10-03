@@ -4,6 +4,7 @@ import {Audio, Video} from '@remotion/media';
 import {useAudioData} from '@remotion/media-utils';
 import {framesFor, sceneSeconds, totalFrames} from './project.js';
 import {narrationCaptionCues} from './captions.js';
+import {priceParts} from './pricing.js';
 
 const font = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
 
@@ -156,9 +157,15 @@ function Overlay({item, accent, frame, duration, animated, index, avatar, hasIns
     );
   }
   if (item.type === 'label') {
+    const price = item.price && priceParts(item.price);
     return (
       <div style={{position: 'absolute', top: 58, left: 66, maxWidth: 1000, background: 'rgba(8,16,24,.84)', borderLeft: `10px solid ${accent}`, padding: '20px 27px', boxShadow: '0 8px 30px #0006', ...enter}}>
         <div style={{fontSize: 38, fontWeight: 900, color: '#fff'}}>{item.text}</div>
+        {price && <div style={{display: 'flex', alignItems: 'baseline', gap: 14, fontSize: 26, fontWeight: 800, color: '#fff', marginTop: 8}}>
+          {price.regular && <span style={{fontSize: 22, color: '#b8c2ca', textDecoration: 'line-through'}}>{price.regular}</span>}
+          <span>{price.current}</span>
+          {price.discount && <span style={{color: '#ff5454'}}>{price.discount}</span>}
+        </div>}
         {item.meta && <div style={{fontSize: item.sectionGame ? 31 : 22, fontWeight: item.sectionGame ? 900 : 700, color: item.sectionGame ? '#fff' : '#d3dee5', marginTop: 8}}>{item.meta}{item.discount && <span style={{color: '#ff5454'}}>（{item.discount}）</span>}</div>}
       </div>
     );

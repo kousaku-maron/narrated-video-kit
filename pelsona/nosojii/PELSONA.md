@@ -31,6 +31,7 @@
 - AivisSpeech「ろてじん（長老ボイス）」のノーマルを使用する。現在の話者 ID は `391794336`。
 - 採用する話速は `speedScale: 1.15`。Invokyr レビューの比較試聴で決めた値。映像側で再生速度を変えず、音声生成時に指定する。
 - 原稿はこの口調で書き、音声合成の前に読みと間を確認する。
+- 語り手名の読みは [readings.json](readings.json) を音声CLIの `--readings` に渡す。作品の固有名詞・誤読は各プロジェクトの `notes/readings.json` へ置く。
 - 音声モデルの[利用条件](https://hub.aivis-project.com/aivm-models/696c98a2-c0b7-4fe7-8cf2-c7e9b8a9bd82?owner=Rotejin)を確認して使う。このキャラクターと画像は独自制作であり、モデル作者による公認・提携を示さない。
 
 ## アバター

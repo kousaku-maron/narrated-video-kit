@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "project": "node scripts/project.mjs",
     "studio": "node scripts/project.mjs studio",
     "render": "node scripts/project.mjs render",

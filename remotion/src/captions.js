@@ -1,4 +1,5 @@
 import {framesFor} from './project.js';
+import {displayText} from './text.js';
 
 const MAX_CHARS = 26;
 
@@ -20,10 +21,9 @@ const splitLongClause = (clause) => {
   return chunks;
 };
 
-// Preserve every character from the narration script while making each cue
-// short enough to read over moving footage.
+// Use display text (never speechText), normalizing counted numbers before splitting.
 export function captionPhrases(value) {
-  const text = value?.trim() ?? '';
+  const text = displayText(value?.trim() ?? '');
   if (!text) return [];
   const clauses = (text.match(/[^、。！？!?]+[、。！？!?]?/gu) ?? [text]).flatMap(splitLongClause);
   const phrases = [];

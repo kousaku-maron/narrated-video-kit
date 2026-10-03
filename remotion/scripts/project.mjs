@@ -1,9 +1,11 @@
 import {constants} from 'node:fs';
 import {copyFile, mkdir, open, readFile, rename, stat, unlink, utimes, writeFile} from 'node:fs/promises';
 import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {sceneSeconds, totalFrames, validateProject} from '../src/project.js';
+import {voiceMetadata} from '../src/narration.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');
@@ -96,6 +98,10 @@ async function check(slug) {
     if (!asset.src.startsWith(prefix)) fail(`Asset ${id} must be stored under ${prefix}`);
     const source = path.resolve(projectAssetsDir(slug), asset.src.slice(prefix.length));
     if (!source.startsWith(`${projectAssetsDir(slug)}${path.sep}`)) fail(`Asset ${id} points outside the project assets/`);
+    if (asset.sha256 !== undefined && (!/^[a-f0-9]{64}$/.test(asset.sha256) ||
+        createHash('sha256').update(await readFile(source)).digest('hex') !== asset.sha256)) {
+      fail(`Asset ${id}: sha256 differs from generated audio; regenerate or update the verified metadata`);
+    }
     await stageFile(source, filename, `Asset ${id}`);
   }
   if (project.persona) {
@@ -121,7 +127,7 @@ async function check(slug) {
 async function init(slug) {
   requireDatedProjectName(slug);
   const filename = manifestPath(slug);
-  if (await stat(filename).catch(() => null)) fail(`Project already exists: ${slug}`);
+  if (await stat(path.dirname(filename)).catch(() => null)) fail(`Project directory already exists: ${slug}`);
   await mkdir(path.dirname(filename), {recursive: true});
   for (const category of ['images', 'footage', 'audio/narration', 'audio/music', 'audio/sfx']) {
     const directory = path.join(projectAssetsDir(slug), category);
@@ -130,7 +136,10 @@ async function init(slug) {
   }
   await writeFile(path.join(projectAssetsDir(slug), 'SOURCES.md'), '# 素材出典\n\n追加した素材の出典は `project -- add` で記録されます。\n');
   await mkdir(path.join(projectsDir, slug, 'publish'), {recursive: true});
-  await writeFile(path.join(projectsDir, slug, 'publish', 'PUBLISH.md'), `# ${slug}｜投稿用テキスト\n\n## タイトル\n\n## 説明文\n`);
+  const publish = path.join(projectsDir, slug, 'publish');
+  await writeFile(path.join(publish, 'PUBLISH.md'), `# ${slug}｜投稿用セット\n\n## タイトル\n\n\`title.txt\` に採用タイトルを保存する。\n\n## 説明文\n\n紹介 → 必要なセール情報 → チャプター → 公式Steamストア → ハッシュタグ → 映像出典の順で \`description.txt\` に保存する。音声・BGMは必須表記のみ追加する。\n\n## 公開記録\n\n\`upload-record.json\` に最新YouTube ID・URL、アップロード／予約／公開日時（JST）、設定と実際のチェック結果を記録する。未確認の項目は pending のままにする。採用サムネイルと編集原稿、字幕もこのフォルダに保存する。\n`);
+  for (const name of ['title.txt', 'description.txt', 'tags.txt']) await writeFile(path.join(publish, name), '', {flag: 'wx'});
+  await copyFile(path.join(root, '..', 'templates', 'upload-record.json'), path.join(publish, 'upload-record.json'), constants.COPYFILE_EXCL);
   await mkdir(path.join(projectsDir, slug, 'notes'), {recursive: true});
   await writeFile(path.join(projectsDir, slug, 'notes', '.gitkeep'), '');
   await save(filename, {
@@ -158,6 +167,13 @@ async function add(slug, input, options) {
   const id = idPosition >= 0 ? options[idPosition + 1] : `asset-${String(Object.keys(project.assets).length + 1).padStart(3, '0')}`;
   const origin = originPosition >= 0 ? options[originPosition + 1] : 'provided';
   const requestedCategory = categoryPosition >= 0 ? options[categoryPosition + 1] : null;
+  const metadataPosition = options.indexOf('--voice-metadata');
+  let metadata;
+  if (metadataPosition >= 0) {
+    if (extension !== '.wav' || !options[metadataPosition + 1]) fail('--voice-metadata requires a WAV and a JSON file');
+    metadata = voiceMetadata(JSON.parse(await readFile(path.resolve(options[metadataPosition + 1]), 'utf8')));
+    if (createHash('sha256').update(await readFile(source)).digest('hex') !== metadata.sha256) fail('Voice metadata does not match the input WAV');
+  }
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id ?? '')) fail('Asset ID must use lowercase letters, numbers, and hyphens');
   if (project.assets[id]) fail(`Asset ID already exists: ${id}`);
   if (!['provided', 'generated', 'aivis'].includes(origin)) fail('origin must be provided, generated, or aivis');
@@ -172,7 +188,7 @@ async function add(slug, input, options) {
   if (source !== destination) await copyFile(source, destination, constants.COPYFILE_EXCL);
   const sourceNote = `${source}.source.txt`;
   const note = (await stat(sourceNote).catch(() => null))?.isFile() ? await readFile(sourceNote, 'utf8') : '出典: 未記入';
-  const asset = {kind, src: relative, origin, originalName: path.basename(source)};
+  const asset = {kind, src: relative, origin, originalName: path.basename(source), ...metadata};
   if (extension === '.wav') {
     const duration = await wavSeconds(destination);
     if (duration) asset.durationSeconds = duration;
