@@ -61,7 +61,7 @@ PYTHONPATH=speech/src python3 -m indie_narration --engine aivis synthesize \
 
 ## 動画を作る
 
-映像の準備、素材の追加、プレビュー、MP4 書き出しは [remotion/README.md](remotion/README.md) を参照してください。動画ごとに `VIDEO.md`、`SCRIPT.md`、`project.json`、素材の原本を [projects/](projects/README.md) にまとめます。用途別のひな形は [templates/](templates/README.md) にあります。`00000000-demo/` 以外の動画プロジェクトは公開リポジトリには含めません。共通素材の原本は [assets/](assets/README.md) に置きます。場面を追加するたびに途中版を確認できます。手持ちの動画・画像と生成画像を同じように背景素材として使えます。
+映像の準備、素材の追加、プレビュー、MP4 書き出しは [remotion/README.md](remotion/README.md) を参照してください。動画ごとに `VIDEO.md`、`SCRIPT.md`、`project.json`、素材の原本を [projects/](projects/README.md) にまとめます。用途別のひな形は [templates/](templates/README.md) にあります。新規制作の冒頭・投稿文・導線・公開前後の確認は [YouTube制作・公開チェック](templates/YOUTUBE_CHECKLIST.md) に沿って進め、`project init` が作る `publish/YOUTUBE_CHECKLIST.md` に結果を残します。`00000000-demo/` 以外の動画プロジェクトは公開リポジトリには含めません。共通素材の原本は [assets/](assets/README.md) に置きます。場面を追加するたびに途中版を確認できます。手持ちの動画・画像と生成画像を同じように背景素材として使えます。
 
 個別プロジェクトの記録と画像・音声は、動画を除いて別の非公開リポジトリへ保存できます。初期設定と `git private-push` の使い方は [公開フレームと非公開の制作記録](docs/private-sync.md) を参照してください。
 

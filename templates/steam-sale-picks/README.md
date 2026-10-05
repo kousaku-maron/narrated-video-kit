@@ -15,11 +15,12 @@ cp templates/steam-sale-picks/SCRIPT.md projects/YYYYMMDD-sale-topic/SCRIPT.md
 cp templates/steam-sale-picks/VISUALS.md projects/YYYYMMDD-sale-topic/notes/VISUALS.md
 cp templates/steam-sale-picks/SALE_CHECK.md projects/YYYYMMDD-sale-topic/notes/SALE_CHECK.md
 cp templates/steam-sale-picks/PUBLISH.md projects/YYYYMMDD-sale-topic/publish/PUBLISH.md
-cp templates/upload-record.json projects/YYYYMMDD-sale-topic/publish/upload-record.json
 cp templates/steam-sale-picks/thumbnail.html projects/YYYYMMDD-sale-topic/publish/thumbnail.html
 ```
 
 `YYYYMMDD` は日本時間の制作開始日で固定する。`{{...}}` を作品とセールに合わせて埋め、任意セクションは不要なら削る。`project.json` は `init` 後に動画固有の素材・場面・尺を設定する。背景とナレーションが決まるまで、ひな形の数値を完成映像の事実として扱わない。
+
+`init` は共通の `publish/YOUTUBE_CHECKLIST.md` と未確認状態の `upload-record.json` も作る。冒頭・関連動画への導線を制作時に計画し、公開前後の実設定と次回の分析をチェックリストへ記録する。詳しくは [共通ひな形](../YOUTUBE_CHECKLIST.md) を参照。
 
 | 文書 | 役割 |
 | --- | --- |

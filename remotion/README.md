@@ -163,7 +163,7 @@ PYTHONPATH=speech/src python3 -m indie_narration --engine aivis synthesize \
 
 セール紹介の価格ラベルは `price.status: sale | regular | unreleased | unknown` で分岐します。確認済み割引は通常額を取消線にし、販売価格と率を表示します。`sale` / `regular` には日本向けの価格、Steam公式ストアURL、タイムゾーン付き確認日時を保存します。紹介冒頭の割引は語り・字幕・チップと音声生成メタデータを照合し、未確認の価格や率を使いません。設定例は [セールの画面仕様](../templates/steam-sale-picks/VISUALS.md) を参照してください。従来の価格以外の `label.meta` は引き続き使えます。
 
-`init` は新規フォルダに `publish/title.txt`・`description.txt`・`tags.txt` と `upload-record.json` を作ります。公開記録は最新YouTube ID・URL、アップロード／予約／公開のJST日時、実際の設定とチェック結果を記入します。既存プロジェクトの公開設定は自動変更しません。詳しくは [projects/README.md](../projects/README.md) を参照してください。
+`init` は新規フォルダに `publish/title.txt`・`description.txt`・`tags.txt`、`upload-record.json` と `YOUTUBE_CHECKLIST.md` を作ります。チェックリストで冒頭の約束・導線の計画と公開前後の実設定、分析を記録します。`check` は素材・描画設定の検証なので、YouTube上の設定や利用資格の確認はチェックリストで別途行います。公開記録は最新YouTube ID・URL、アップロード／予約／公開のJST日時、実際の設定とチェック結果を記入します。既存プロジェクトの公開設定は自動変更しません。詳しくは [projects/README.md](../projects/README.md) を参照してください。
 
 ## 検証
 

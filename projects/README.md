@@ -22,7 +22,8 @@ projects/YYYYMMDD-name/
     PUBLISH.md             投稿方針と公開記録の書き方
     title.txt              採用タイトル
     description.txt        貼り付け用説明文
-    tags.txt               タグ欄
+    tags.txt               タグ欄（ハッシュタグとは別）
+    YOUTUBE_CHECKLIST.md    新規制作の計画・公開前後確認・分析
     upload-record.json     最新YouTube ID・日時JST・設定・チェック結果
     thumbnail.html         サムネイルの編集用原稿（必要な場合）
     thumbnail.png          完成サムネイル（必要な場合）
@@ -43,7 +44,9 @@ projects/YYYYMMDD-name/
 
 台本を変更したら `project.json` の字幕用 `narration.text`、TTS用 `narration.speechText` と対応する音声・生成メタデータを揃えます。`VIDEO.md` は現行の方針を短く保ち、変更履歴や調査メモは `notes/` に分けます。Remotionが自動で読むのは `project.json` です。
 
-投稿文は紹介 → 必要な場合のみセール情報 → チャプター → 公式Steamストア → ハッシュタグ → 映像出典の順にします。任意の音声・BGMクレジットは加えず、素材ごとの必須表記は保持します。`upload-record.json` は最新YouTube ID・URL、日時（`+09:00`、JST）、実際の設定とチェック結果を記録し、未確認は `null` / `pending` のままにします。
+`init` が作る `publish/YOUTUBE_CHECKLIST.md` で、冒頭30秒の約束と終了画面・カード・再生リストの計画、公開前と公開後の実設定、同期間・流入元別の分析、任意A/Bの資格を確認します。[共通ひな形](../templates/YOUTUBE_CHECKLIST.md) は新規制作だけに使い、既存・完成・予約・公開済み動画へ一括適用しません。未公開リンク・仮URL・架空IDを投稿文や設定に入れません。
+
+投稿文は動画固有の2〜3行（誰向け・紹介内容・選定条件） → 必要な場合のみセール情報 → チャプター → 公式Steamストア → ハッシュタグ → 映像出典の順にします。任意の音声・BGMクレジットは加えず、素材ごとの必須表記は保持します。`upload-record.json` は最新YouTube ID・URL、日時（`+09:00`、JST）、実際の設定とチェック結果を記録し、未確認は `null` / `pending` のままにします。
 
 ## 公開後の整理
 

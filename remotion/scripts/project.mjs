@@ -137,9 +137,11 @@ async function init(slug) {
   await writeFile(path.join(projectAssetsDir(slug), 'SOURCES.md'), '# 素材出典\n\n追加した素材の出典は `project -- add` で記録されます。\n');
   await mkdir(path.join(projectsDir, slug, 'publish'), {recursive: true});
   const publish = path.join(projectsDir, slug, 'publish');
-  await writeFile(path.join(publish, 'PUBLISH.md'), `# ${slug}｜投稿用セット\n\n## タイトル\n\n\`title.txt\` に採用タイトルを保存する。\n\n## 説明文\n\n紹介 → 必要なセール情報 → チャプター → 公式Steamストア → ハッシュタグ → 映像出典の順で \`description.txt\` に保存する。音声・BGMは必須表記のみ追加する。\n\n## 公開記録\n\n\`upload-record.json\` に最新YouTube ID・URL、アップロード／予約／公開日時（JST）、設定と実際のチェック結果を記録する。未確認の項目は pending のままにする。採用サムネイルと編集原稿、字幕もこのフォルダに保存する。\n`);
+  await writeFile(path.join(publish, 'PUBLISH.md'), `# ${slug}｜投稿用セット\n\n## タイトル\n\n\`title.txt\` に採用タイトルを保存する。\n\n## 説明文\n\n動画固有の2〜3行（誰向け・紹介内容・選定条件） → 必要なセール情報 → チャプター → 公式Steamストア → ハッシュタグ → 映像出典の順で \`description.txt\` に保存する。主要語句1〜2個をタイトルと説明へ自然に使う。チャプターは正式ゲーム名付き、00:00開始・3区間以上・各10秒以上。ハッシュタグは関連する少数、通常タグは誤綴りなどの補助として \`tags.txt\` に分ける。音声・BGMは必須表記のみ追加する。\n\n## 制作・公開チェック\n\n[YouTube制作・公開チェック](YOUTUBE_CHECKLIST.md) で冒頭30秒の約束と終了画面・カード・再生リストを計画し、公開前後の実設定、分析、任意A/Bの条件を確認する。未公開リンク・仮URL・架空IDを投稿文や設定へ入れない。\n\n## 公開記録\n\n\`upload-record.json\` に最新YouTube ID・URL、アップロード／予約／公開日時（JST）、設定と実際のチェック結果を記録する。未確認の項目は pending のままにする。採用サムネイルと編集原稿、字幕もこのフォルダに保存する。\n`);
   for (const name of ['title.txt', 'description.txt', 'tags.txt']) await writeFile(path.join(publish, name), '', {flag: 'wx'});
-  await copyFile(path.join(root, '..', 'templates', 'upload-record.json'), path.join(publish, 'upload-record.json'), constants.COPYFILE_EXCL);
+  for (const name of ['upload-record.json', 'YOUTUBE_CHECKLIST.md']) {
+    await copyFile(path.join(root, '..', 'templates', name), path.join(publish, name), constants.COPYFILE_EXCL);
+  }
   await mkdir(path.join(projectsDir, slug, 'notes'), {recursive: true});
   await writeFile(path.join(projectsDir, slug, 'notes', '.gitkeep'), '');
   await save(filename, {
@@ -147,8 +149,8 @@ async function init(slug) {
     theme: {accent: '#f6c84c'}, assets: {},
     scenes: [{id: 'opening', durationSeconds: 3, background: {color: '#172b3d'}, overlays: [{type: 'title', text: slug}]}],
   });
-  await writeFile(path.join(projectsDir, slug, 'VIDEO.md'), `# ${slug}\n\n- 状態: 構成中\n- 語り手: 未設定\n- 目標尺: 未設定\n\n## 企画\n\nこの動画で伝えることを記入します。\n\n## 素材\n\n採用した素材は \`assets/\`、出典は \`assets/SOURCES.md\` に置きます。共通素材はリポジトリ直下の \`assets/\`、キャラクター設定は \`pelsona/\` を参照します。\n`);
-  await writeFile(path.join(projectsDir, slug, 'SCRIPT.md'), `# ${slug} 台本\n\n## opening\n\n- ナレーション: （ここに記入）\n- 映像・画面文字: （ここに記入）\n\n場面 ID は \`project.json\` と揃えます。\n`);
+  await writeFile(path.join(projectsDir, slug, 'VIDEO.md'), `# ${slug}\n\n- 状態: 構成中\n- 語り手: 未設定\n- 目標尺: 未設定\n\n## 企画\n\n想定視聴者・紹介内容・選定条件、主要語句1〜2個、タイトル・サムネイルの約束を記入します。冒頭30秒の代表映像と関連動画への導線は \`publish/YOUTUBE_CHECKLIST.md\` に計画します。\n\n## 素材\n\n採用した素材は \`assets/\`、出典は \`assets/SOURCES.md\` に置きます。共通素材はリポジトリ直下の \`assets/\`、キャラクター設定は \`pelsona/\` を参照します。\n`);
+  await writeFile(path.join(projectsDir, slug, 'SCRIPT.md'), `# ${slug} 台本\n\n## opening\n\n- ナレーション: （ここに記入）\n- 映像・画面文字: （冒頭30秒内に約束に合う代表映像と選定基準を示す。ここに記入）\n\n場面 ID は \`project.json\` と揃えます。\n`);
   console.log(`Created ${filename}`);
 }
 

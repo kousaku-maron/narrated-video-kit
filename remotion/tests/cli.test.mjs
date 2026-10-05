@@ -16,7 +16,9 @@ test('init records pending upload fields; voice import checks WAV evidence and p
       await copyFile(new URL(`../${name}`, import.meta.url), path.join(root, 'remotion', name));
     }
     await writeFile(path.join(root, 'remotion/package.json'), '{"type":"module"}');
-    await copyFile(new URL('../../templates/upload-record.json', import.meta.url), path.join(root, 'templates/upload-record.json'));
+    for (const name of ['upload-record.json', 'YOUTUBE_CHECKLIST.md']) {
+      await copyFile(new URL(`../../templates/${name}`, import.meta.url), path.join(root, 'templates', name));
+    }
     const run = (...args) => spawnSync(process.execPath, [path.join(root, 'remotion/scripts/project.mjs'), ...args], {encoding: 'utf8'});
     const slug = '20991231-integration';
     const initialized = run('init', slug);
@@ -28,9 +30,13 @@ test('init records pending upload fields; voice import checks WAV evidence and p
     assert.ok(Object.values(record.settings).every((value) => value === null));
     assert.ok(Object.values(record.checks).every((check) => check.status === 'pending'));
     for (const file of ['title.txt', 'description.txt', 'tags.txt']) assert.equal(await readFile(path.join(publish, file), 'utf8'), '');
+    const checklist = path.join(publish, record.files.checklist);
+    assert.equal(await readFile(checklist, 'utf8'), await readFile(path.join(root, 'templates/YOUTUBE_CHECKLIST.md'), 'utf8'));
+    await writeFile(checklist, 'User navigation plan');
     await writeFile(path.join(publish, 'title.txt'), 'User title');
     assert.notEqual(run('init', slug).status, 0);
     assert.equal(await readFile(path.join(publish, 'title.txt'), 'utf8'), 'User title');
+    assert.equal(await readFile(checklist, 'utf8'), 'User navigation plan');
 
     const wav = Buffer.alloc(4844);
     wav.write('RIFF'); wav.writeUInt32LE(4836, 4); wav.write('WAVEfmt ', 8);
